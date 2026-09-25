@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBcore — End-to-End Platform Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --midnight:#0A0E27;--royal:#1E3A8A;--electric:#3B82F6;
+            --cyan:#06B6D4;--emerald:#10B981;--amber:#F59E0B;
+            --rose:#F43F5E;--purple:#8B5CF6;--neon:#00F0FF;
+            --gold:#FBBF24;--white:#FFFFFF;--plat:#F8FAFC;
+        }
+        html,body{width:100%;height:100%;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif;background:var(--midnight);color:var(--white);overflow:hidden}
+        .animated-bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(135deg,#0A0E27 0%,#0F1729 100%)}
+        .bg-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.12;animation:drift 32s infinite ease-in-out}
+        @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(110px,-90px) scale(1.25)}66%{transform:translate(-80px,70px) scale(.85)}}
+        .stars{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+        .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite ease-in-out}
+        @keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.95;transform:scale(1.4)}}
+        
+        #slides-container{position:relative;z-index:1;width:100vw;height:100vh;overflow:hidden}
+        .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(1rem,2.5vh,2.5rem) clamp(1rem,3vw,3rem);opacity:0;pointer-events:none;transition:opacity .6s ease,transform .6s cubic-bezier(.4,0,.2,1)}
+        .slide.active{opacity:1;pointer-events:all;transform:translateX(0)!important}
+        
+        /* CONTROLS & HEADER NAV */
+        .controls{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:.8rem;background:rgba(10,14,39,.85);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.14);border-radius:50px;padding:.5rem 1.4rem;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+        .ctrl-btn{background:none;border:none;color:var(--white);cursor:pointer;padding:.4rem .8rem;border-radius:10px;font-size:1.1rem;transition:all .2s;opacity:.8}
+        .ctrl-btn:hover{opacity:1;background:rgba(255,255,255,.12);transform:scale(1.05)}
+        .slide-counter{font-size:.85rem;color:rgba(255,255,255,.8);font-weight:700;min-width:5.5rem;text-align:center;font-family:'Outfit',sans-serif}
+        .progress-wrap{position:fixed;top:0;left:0;right:0;z-index:100;height:4px;background:rgba(255,255,255,.1)}
+        .progress-bar{height:100%;background:linear-gradient(90deg,var(--neon),var(--electric),var(--purple));transition:width .4s ease;box-shadow:0 0 12px var(--neon)}
+        .timer{font-size:.8rem;color:rgba(255,255,255,.6);font-family:'Outfit',monospace;font-weight:600}
+        .autoplay-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:.35rem clamp(.6rem,1vw,1rem);border-radius:20px;font-size:.78rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:.4rem}
+        .autoplay-btn:hover{background:rgba(255,255,255,.2)}
+        .autoplay-btn.active{background:linear-gradient(135deg,var(--electric),var(--purple));border-color:transparent;box-shadow:0 0 15px rgba(59,130,246,.5)}
+        .search-trigger-btn{background:rgba(0,240,255,.12);border:1px solid rgba(0,240,255,.3);color:var(--neon);cursor:pointer;padding:.35rem .9rem;border-radius:20px;font-size:.78rem;font-weight:700;transition:all .2s}
+        .search-trigger-btn:hover{background:rgba(0,240,255,.25);transform:scale(1.03)}
+
+        .nav-dots{position:fixed;right:1.2rem;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:.45rem}
+        .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s}
+        .dot.active{background:var(--neon);width:8px;height:22px;border-radius:4px;box-shadow:0 0 10px var(--neon)}
+        .dot:hover{background:rgba(255,255,255,.8)}
+
+        /* TITLE SLIDE DESIGN */
+        .title-slide{text-align:center;width:100%;max-width:1100px}
+        .title-slide .tagline{font-size:clamp(1.1rem,2.8vw,2.1rem);color:var(--gold);font-weight:800;margin:.6rem 0;letter-spacing:.05em;animation:fadeUp 1s 0.3s both}
+        .title-slide .subtitle{font-size:clamp(.95rem,1.8vw,1.4rem);color:var(--cyan);font-weight:600;animation:fadeUp 1s 0.6s both}
+        .title-slide .stats-row{display:flex;gap:clamp(1rem,3vw,3rem);justify-content:center;margin-top:2.2rem;animation:fadeUp 1s 0.9s both}
+        .title-stat{text-align:center}
+        .title-stat .num{font-family:'Outfit',sans-serif;font-size:clamp(2.2rem,4vw,3.2rem);font-weight:900;background:linear-gradient(135deg,var(--neon),var(--electric));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .title-stat .lbl{font-size:.78rem;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.12em;margin-top:.2rem;font-weight:600}
+        .stat-sep{width:1px;height:45px;background:rgba(255,255,255,.15);align-self:center}
+        
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* LOGO EMBLEM */
+        .logo-ring-wrap{position:relative;width:170px;height:170px;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center}
+        .logo-outer-ring{position:absolute;inset:-12px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--neon),var(--purple),var(--electric)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;animation:spinRing 4s linear infinite;opacity:.85}
+        .logo-inner-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--gold),var(--amber),var(--neon)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;animation:spinRing 6s linear infinite reverse;opacity:.75}
+        @keyframes spinRing{to{transform:rotate(360deg)}}
+        .logo-circle{width:155px;height:155px;border-radius:50%;background:#ffffff;border:3px solid rgba(255,255,255,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(0,240,255,.6),0 0 90px rgba(139,92,246,.4),inset 0 0 15px rgba(0,0,0,.05);animation:logoPulse 3s ease-in-out infinite;position:relative;overflow:hidden;padding:6px}
+        @keyframes logoPulse{0%,100%{box-shadow:0 0 40px rgba(0,240,255,.5),0 0 70px rgba(139,92,246,.4)}50%{box-shadow:0 0 75px rgba(0,240,255,.8),0 0 110px rgba(139,92,246,.6)}}
+        .webcore-logo-img{width:138px;height:138px;object-fit:contain;border-radius:50%;animation:logoFloat 4s ease-in-out infinite;background:#ffffff}
+
+        @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.02)}}
+        .logo-text-main{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff,var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .logo-text-sub{font-size:.65rem;font-weight:800;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:-2px}
+
+
+        /* OVERVIEW SLIDE */
+        .overview-slide{width:100%;max-width:1320px}
+        .slide-header{text-align:center;margin-bottom:1.4rem}
+        .slide-header .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.22em;color:var(--neon);font-weight:800;margin-bottom:.4rem}
+        .slide-header h2{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4.5vw,3.2rem);font-weight:900}
+        
+        .modules-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.9rem;width:100%;max-width:1250px;max-height:calc(100vh - 240px);overflow-y:auto;padding-right:.3rem}
+        .modules-grid::-webkit-scrollbar{width:5px}
+        .modules-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
+        
+        .mod-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:.8rem .9rem;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+        .mod-chip::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--chip-color,var(--electric))25,transparent);opacity:0;transition:opacity .3s}
+        .mod-chip:hover{transform:translateY(-4px);border-color:var(--chip-color,var(--electric));box-shadow:0 10px 30px rgba(0,0,0,.4)}
+        .mod-chip:hover::before{opacity:1}
+        .mod-chip .chip-icon{font-size:1.5rem;margin-bottom:.3rem;display:block}
+        .mod-chip .chip-name{font-size:.76rem;font-weight:700;color:rgba(255,255,255,.95);line-height:1.2}
+
+        /* MODULE DEEP DIVE SLIDES */
+        .module-slide{width:100%;max-width:1300px;position:relative}
+        .mod-header{display:flex;align-items:flex-start;gap:1.8rem;margin-bottom:1.4rem}
+        .mod-icon-wrap{width:75px;height:75px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0;position:relative;overflow:hidden;animation:iconPop .6s cubic-bezier(.34,1.56,.64,1) both;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+        @keyframes iconPop{from{opacity:0;transform:scale(.4) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+        .mod-number{font-size:.78rem;text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.2rem}
+        .mod-title{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,3.8vw,2.8rem);font-weight:900;line-height:1.1}
+        .mod-tagline{font-size:clamp(.85rem,1.5vw,1.15rem);color:rgba(255,255,255,.7);margin-top:.3rem;font-weight:600}
+        .mod-description{font-size:clamp(.82rem,1.2vw,.96rem);color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:1.2rem;padding:.9rem 1.2rem;background:rgba(255,255,255,.04);border-left:4px solid;border-radius:0 10px 10px 0;backdrop-filter:blur(10px)}
+        
+        .submodules-grid{display:grid;gap:.8rem;max-height:calc(100vh - 290px);overflow-y:auto;padding-right:.4rem}
+        .submodules-grid::-webkit-scrollbar{width:4px}
+        .submodules-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+        
+        .submodule-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:.9rem 1.1rem;position:relative;overflow:hidden;transition:all .3s}
+        .submodule-card:hover{transform:translateX(5px);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08)}
+        .sub-name{font-weight:800;font-size:.88rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+        .funcs-wrap{display:flex;flex-wrap:wrap;gap:.35rem}
+        .func-tag{font-size:.72rem;padding:.25rem .65rem;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.9);white-space:nowrap;transition:all .2s;cursor:pointer}
+        .func-tag:hover{background:rgba(255,255,255,.2);transform:scale(1.04);color:#fff}
+        
+        .grid-2{grid-template-columns:repeat(2,1fr)}
+        .grid-3{grid-template-columns:repeat(3,1fr)}
+        .grid-1{grid-template-columns:1fr}
+
+        /* CLOSER SLIDE */
+        .closer-slide{text-align:center;width:100%;max-width:1050px;max-height:calc(100vh - 110px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:3.2rem;position:relative}
+        .closer-slide h2{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4.2vw,3.4rem);font-weight:900;background:linear-gradient(135deg,var(--white),var(--neon),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem;filter:drop-shadow(0 0 25px rgba(0,240,255,.4));line-height:1.15}
+        .closer-slide .sub{font-size:clamp(.85rem,1.5vw,1.15rem);color:var(--gold);font-weight:700;margin-bottom:.8rem}
+        .cta-wrap{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:.8rem}
+        .cta-btn{padding:.7rem 1.5rem;border-radius:50px;font-weight:800;font-size:.88rem;cursor:pointer;border:none;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem}
+        .cta-primary{background:linear-gradient(135deg,var(--electric),var(--purple));color:#fff;box-shadow:0 6px 25px rgba(59,130,246,.4)}
+        .cta-primary:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(59,130,246,.6)}
+        .cta-secondary{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3)}
+        .cta-secondary:hover{background:rgba(255,255,255,.12)}
+        .cta-website{background:linear-gradient(135deg,var(--emerald),var(--electric));color:#fff;box-shadow:0 6px 25px rgba(16,185,129,.4)}
+        .cta-website:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(16,185,129,.6)}
+        .cta-admin{background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;box-shadow:0 6px 25px rgba(139,92,246,.4)}
+        .cta-admin:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(139,92,246,.6)}
+
+        .closer-modules-list{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;max-width:960px;max-height:24vh;overflow-y:auto;margin:.4rem auto 1rem;padding:.4rem;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+        .closer-modules-list::-webkit-scrollbar{width:4px}
+        .closer-modules-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+        .closer-chip{font-size:.68rem;padding:.25rem .65rem;border-radius:20px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);cursor:pointer;transition:all .2s;white-space:nowrap}
+        .closer-chip:hover{background:rgba(255,255,255,.18);transform:scale(1.04)}
+
+
+        .pill-badge{padding:.35rem .9rem;border-radius:50px;border:1px solid var(--pc,var(--electric));color:var(--pc,var(--electric));font-size:clamp(.68rem,1vw,.82rem);font-weight:700;background:rgba(255,255,255,.05);backdrop-filter:blur(10px)}
+        .mod-glow{position:absolute;width:450px;height:450px;border-radius:50%;filter:blur(110px);opacity:.08;right:-100px;top:-100px;pointer-events:none}
+
+        /* FEATURE INSPECTOR MODAL */
+        .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(10,14,39,.85);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}
+        .modal-overlay.active{opacity:1;pointer-events:all}
+        .modal-box{background:linear-gradient(135deg,#131B3E,#0A0E27);border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:2rem;width:90%;max-width:620px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.7);transform:scale(.9);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+        .modal-overlay.active .modal-box{transform:scale(1)}
+        .modal-close{position:absolute;right:1.2rem;top:1.2rem;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;opacity:.7;transition:opacity .2s}
+        .modal-close:hover{opacity:1}
+        .modal-tag{display:inline-block;font-size:.7rem;padding:.2rem .6rem;border-radius:20px;background:rgba(0,240,255,.15);color:var(--neon);font-weight:700;margin-bottom:.8rem;text-transform:uppercase}
+        .modal-title{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.5rem;color:#fff}
+        .modal-desc{font-size:.9rem;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:1.2rem}
+        .modal-meta{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;background:rgba(255,255,255,.05);padding:1rem;border-radius:12px;font-size:.8rem}
+        .meta-lbl{color:rgba(255,255,255,.5);font-weight:600;margin-bottom:.2rem}
+        .meta-val{color:var(--neon);font-weight:700}
+
+        /* SEARCH MODAL */
+        .search-modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(10,14,39,.9);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;padding:4rem 1rem 2rem;opacity:0;pointer-events:none;transition:opacity .3s ease}
+        .search-modal-overlay.active{opacity:1;pointer-events:all}
+        .search-input-wrap{width:100%;max-width:700px;position:relative;margin-bottom:1.5rem}
+        .search-input{width:100%;padding:1.1rem 1.6rem;border-radius:50px;background:rgba(255,255,255,.08);border:2px solid var(--electric);color:#fff;font-size:1.1rem;outline:none;box-shadow:0 0 30px rgba(59,130,246,.3);font-family:'Plus Jakarta Sans',sans-serif}
+        .search-input::placeholder{color:rgba(255,255,255,.4)}
+        .search-results{width:100%;max-width:700px;max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:.6rem;padding-right:.3rem}
+        .search-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.9rem 1.2rem;cursor:pointer;transition:all .2s}
+        .search-item:hover{background:rgba(255,255,255,.12);border-color:var(--neon);transform:translateX(5px)}
+        .search-item-title{font-weight:700;font-size:.95rem;color:#fff}
+        .search-item-sub{font-size:.78rem;color:var(--cyan);margin-top:.2rem}
+        
+        #particleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+    </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+<div class="animated-bg" id="animBg"></div>
+<div class="stars" id="starsBg"></div>
+
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<div id="slides-container"></div>
+<div class="nav-dots" id="navDots"></div>
+
+<div class="controls">
+    <button class="ctrl-btn" id="prevBtn" title="Previous Slide (Left Arrow)">&#8592;</button>
+    <span class="slide-counter" id="slideCounter">1 / 30</span>
+    <button class="ctrl-btn" id="nextBtn" title="Next Slide (Right Arrow)">&#8594;</button>
+    <button class="autoplay-btn" id="autoplayBtn" title="Toggle Autoplay Mode (Spacebar)">
+        <span id="playIcon">&#9654;</span> <span id="playText">Auto</span>
+    </button>
+    <button class="search-trigger-btn" id="searchTriggerBtn" title="Search Features (Key: S)">🔍 Search</button>
+    <span class="timer" id="timer">00:00</span>
+</div>
+
+<!-- FEATURE INSPECTOR MODAL -->
+<div class="modal-overlay" id="featureModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeFeatureModal()">&times;</button>
+        <span class="modal-tag" id="modalTag">FEATURE SPECIFICATION</span>
+        <div class="modal-title" id="modalTitle">Feature Title</div>
+        <div class="modal-desc" id="modalDesc">Detailed specification and administrative workflow overview for this module feature.</div>
+        <div class="modal-meta">
+            <div>
+                <div class="meta-lbl">Target Audience / Role</div>
+                <div class="meta-val" id="metaRole">Super Admin / Web Editors</div>
+            </div>
+            <div>
+                <div class="meta-lbl">Platform Route / Component</div>
+                <div class="meta-val" id="metaRoute">/admin/...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH MODAL -->
+<div class="search-modal-overlay" id="searchModal">
+    <div class="search-input-wrap">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search 250+ features, modules, or tools... (Press ESC to close)" autofocus>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+//  WEBcore MODULE DATA — 26 Comprehensive Core Modules & 260+ Features
+// ═══════════════════════════════════════════════════════════════════════════════
+const modules = [
+  {
+    id: 1, name: "WEBSITE PAGES & DYNAMIC CMS", icon: "🌐", color: "#3B82F6",
+    tagline: "Core Content & Dynamic Page Architecture",
+    desc: "Comprehensive content management for Home About, Facilities, Leadership, History, Vision & Mission, Infrastructure, and customizable policy pages.",
+    submodules: [
+      { name: "About & Vision Pages", icon: "🏛️", funcs: ["History Timeline", "Vision & Mission Statements", "Leadership & Management Profiles", "Resource Links", "Credentia & Affiliations"] },
+      { name: "Policy & Governance", icon: "📜", funcs: ["Privacy Policy", "Terms & Conditions", "Refund Policy", "Custom Policy Pages", "Draft/Publish Workflow"] },
+      { name: "Dynamic Facilities Builder", icon: "🏢", funcs: ["Home Facility Items", "Campus Infrastructure", "Facility Image Galleries", "Custom Detail Slugs"] },
+      { name: "School Details & Branding", icon: "⚙️", funcs: ["School Name & Code", "Favicon & Logo Config", "Affiliation Specs", "Contact Info & Maps"] }
+    ]
+  },
+  {
+    id: 2, name: "HOMEPAGE CAROUSEL & HEADER ENGINE", icon: "🎠", color: "#0EA5E9",
+    tagline: "Hero Media Banner & Layout Customizer",
+    desc: "Manage homepage hero banner carousels, section ordering, active image toggles, and customized headers for Admissions, Learning, and Campus sections.",
+    submodules: [
+      { name: "Homepage Carousel Manager", icon: "🖼️", funcs: ["Hero Image Upload", "Slide Sequence Reordering", "Active/Inactive Toggle", "Slide Caption & CTA Links"] },
+      { name: "Section Layout Builder", icon: "🧩", funcs: ["Section Drag-and-Drop Order", "Section Visibility Controls", "Layout Presets", "Section Background Config"] },
+      { name: "Section Header Customizer", icon: "📐", funcs: ["Admissions Home Header", "Learning Home Header", "Our Campus Home Header", "Custom Taglines"] },
+      { name: "Home Facility Items Carousel", icon: "🎡", funcs: ["Home Facility Cards", "Icon Customizer", "Display Sequence", "Click-through URLs"] }
+    ]
+  },
+  {
+    id: 3, name: "EVENTS & ACTIVITIES CMS", icon: "🎪", color: "#10B981",
+    tagline: "Categorized School Event Management",
+    desc: "Complete lifecycle for Class Assemblies, School Programs, Clubs, Associations, and Generic Events with custom categories, image galleries, and event statistics.",
+    submodules: [
+      { name: "Event Category Master", icon: "🏷️", funcs: ["Category Creation", "Display Order Config", "Category Soft-Delete", "Sub-Category Mapping"] },
+      { name: "Class Assembly Management", icon: "🏫", funcs: ["Class-Wise Filter", "Date & Theme Entry", "Assembly Photo Gallery", "Multi-Image Upload"] },
+      { name: "Clubs & Associations", icon: "🤝", funcs: ["Club Activities", "Association Meet Reports", "Student Coordinators", "Event Archiving"] },
+      { name: "Generic Events Engine", icon: "⚡", funcs: ["Category & Sub-Category Binding", "Featured Images", "Event Stats Counter", "Category Relocation"] }
+    ]
+  },
+  {
+    id: 4, name: "INTER-SCHOOL FEST MANAGEMENT", icon: "🏆", color: "#F59E0B",
+    tagline: "Multi-Event Competitive Fest Suite",
+    desc: "Dedicated platform for organizing inter-school fests, managing multiple sub-events, rules, registration guidelines, and multi-album event galleries.",
+    submodules: [
+      { name: "Fest Configuration", icon: "⚙️", funcs: ["Fest Title & Theme", "Date & Venue Setup", "Banner & Poster Upload", "Fest Landing Page Generator"] },
+      { name: "Sub-Event Manager", icon: "🎯", funcs: ["Event Categories", "Rules & Guidelines", "Timing & Venue Slots", "Teacher & Student Coordinators"] },
+      { name: "Fest Gallery & Media", icon: "📸", funcs: ["Multi-Image Upload", "Image Reordering", "Event-Wise Photo Sorting", "High-Res Image Viewer"] },
+      { name: "Fest Registration Links", icon: "📝", funcs: ["Registration Form Integration", "Rules PDF Download", "Contact Details", "Live Schedule Ticker"] }
+    ]
+  },
+  {
+    id: 5, name: "ANNOUNCEMENTS & TICKER SYSTEM", icon: "📢", color: "#06B6D4",
+    tagline: "Real-Time Alerts & Video Announcements",
+    desc: "Omnichannel announcement suite featuring dynamic headscroller marquees, popup notifications, priority pinning, and video announcement embeds.",
+    submodules: [
+      { name: "Headscroller Ticker", icon: "📡", funcs: ["Scrolling Text Alerts", "Speed & Direction Controls", "Click-through Links", "Ticker Active Status"] },
+      { name: "Urgent Announcements", icon: "🔔", funcs: ["Priority Pin to Top", "Publish & Expiry Date", "Target Audience Tags", "Rich Text Announcements"] },
+      { name: "Video Announcements", icon: "🎥", funcs: ["YouTube/Vimeo Embeds", "Thumbnail Customizer", "Video Title & Description", "Modal Video Player"] },
+      { name: "Announcement Archive", icon: "🗄️", funcs: ["Searchable History", "Category Tagging", "Auto-Archiving Rules", "Public/Internal Visibility"] }
+    ]
+  },
+  {
+    id: 6, name: "ONLINE ADMISSION & REGISTRATION", icon: "🎓", color: "#EC4899",
+    tagline: "Complete Student Enrollment Pipeline",
+    desc: "Automated online admission engine with multi-step registration forms, customizable settings, eligibility criteria, entrance test schedules, and admission FAQs.",
+    submodules: [
+      { name: "Admission Steps Config", icon: "📋", funcs: ["Step-by-Step Flow Builder", "Step Descriptions", "Active Step Toggle", "Field Customizer"] },
+      { name: "Online Registration Form", icon: "✍️", funcs: ["Student Personal Details", "Parent Information", "Previous Academic Records", "Document Uploads"] },
+      { name: "Criteria & Entrance Test", icon: "📌", funcs: ["Class-Wise Criteria", "Syllabus Download", "Entrance Exam Dates", "Venue & Instructions"] },
+      { name: "FAQ & Helpdesk", icon: "❓", funcs: ["Category FAQs", "Quick Search", "Parent Support Links", "Fee Structure Overview"] }
+    ]
+  },
+  {
+    id: 7, name: "ACHIEVEMENTS & SCHOLARSHIPS HUB", icon: "🥇", color: "#8B5CF6",
+    tagline: "Excellence Showcase & Centum Records",
+    desc: "Track and display student scholastic & co-scholastic milestones, Grade 10 & 12 centum scorers, annual merit scholarships, and trailblazer stories.",
+    submodules: [
+      { name: "Board Exam Centums", icon: "🌟", funcs: ["Grade 10 Centum Lists", "Grade 12 Centum Lists", "Subject-Wise Toppers", "Year-Wise Filters (2020-2026)"] },
+      { name: "Merit Scholarships", icon: "🏅", funcs: ["Annual Merit Awards", "Scholarship Eligibility", "Awardee Photos", "PDF Reports"] },
+      { name: "Scholastic & Co-Scholastic", icon: "🎨", funcs: ["Prize Distribution Lists", "Annual Day Awards", "Sports & Cultural Trophies", "Category Badges"] },
+      { name: "Trailblazer Stories", icon: "🚀", funcs: ["Human Interest Articles", "Inspirational Profiles", "Student/Staff Interviews", "Featured Hero Banner"] }
+    ]
+  },
+  {
+    id: 8, name: "ALUMNI NETWORK & PLACEMENTS", icon: "👨‍🎓", color: "#6366F1",
+    tagline: "Global Alumni Connections & Placements",
+    desc: "Comprehensive alumni portal documenting annual alumni meets, career placements, university admissions, legacy records, and success stories.",
+    submodules: [
+      { name: "Alumni Meet Archives", icon: "🗓️", funcs: ["Yearly Meet Records (2019-2025)", "Photo Highlights", "Event Summary", "Alumni Registration Link"] },
+      { name: "Placement Tracker", icon: "💼", funcs: ["Higher Education Admissions", "Global University Admits", "Career Placements", "Batch-Wise Filters"] },
+      { name: "Alumni Stories", icon: "💬", funcs: ["Alumni Spotlight", "Guest Speaker Profiles", "Mentorship Connections", "Testimonial Videos"] },
+      { name: "Alumni Directory", icon: "📇", funcs: ["Graduation Year Master", "Field of Study Tagging", "Contact Preferences", "Verified Profiles"] }
+    ]
+  },
+  {
+    id: 9, name: "CAMPUS MEDIA & GALLERY MANAGER", icon: "🖼️", color: "#F43F5E",
+    tagline: "High-Performance Visual Media Assets",
+    desc: "Centralized photo gallery system featuring drag-and-drop image reordering, year-wise albums, lazy-loading AJAX grid, and S3 CDN optimization.",
+    submodules: [
+      { name: "Album Management", icon: "📁", funcs: ["Year-Wise Filtering", "Album Category Tags", "Cover Photo Selector", "Publish Status"] },
+      { name: "Media Upload & Storage", icon: "☁️", funcs: ["Bulk File Uploader", "Automatic Image Compression", "Thumbnail Generator", "AWS S3 Integration"] },
+      { name: "Drag-and-Drop Reorder", icon: "🔀", funcs: ["Visual Grid Reordering", "Instant Sequence Update", "Featured Badge Selector", "Caption Editor"] },
+      { name: "Frontend Lightbox", icon: "🔍", funcs: ["Responsive Modal Viewer", "Touch Swipe Support", "AJAX Load More", "High-Res Asset Delivery"] }
+    ]
+  },
+  {
+    id: 10, name: "BLOGS & ARTICLE ENGINE", icon: "✍️", color: "#14B8A6",
+    tagline: "Rich Publishing & Knowledge Sharing",
+    desc: "Editorial blogging suite for staff and student publications, featuring rich text editing, draft state workflows, caption management, and SEO metadata.",
+    submodules: [
+      { name: "Article Builder", icon: "📝", funcs: ["Rich Text Editor", "Category Selection", "Author Assignment", "Slug Generator"] },
+      { name: "Multi-Image Galleries", icon: "🖼️", funcs: ["Embedded In-Article Images", "Caption Editor", "Image Deletion", "Inline Alignment"] },
+      { name: "Workflow & Status", icon: "⚙️", funcs: ["Draft / Published / Archived", "Instant Status Toggle", "Preview Mode", "Publication Timestamp"] },
+      { name: "Public Reader View", icon: "📖", funcs: ["Responsive Reading View", "Social Share Buttons", "Related Articles Widget", "Search & Filter"] }
+    ]
+  },
+  {
+    id: 11, name: "PARENT & COMMUNITY ENGAGEMENT", icon: "💬", color: "#A78BFA",
+    tagline: "Transparent Stakeholder Communication",
+    desc: "Manage parent testimonials, executive messages, campus journey cards, interactive virtual tours, and public inquiries with instant notifications.",
+    submodules: [
+      { name: "Testimonials Master", icon: "⭐", funcs: ["Parent Testimonials", "Alumni Feedback", "Star Rating & Reviews", "Approval Status"] },
+      { name: "Executive & Journey Messages", icon: "✉️", funcs: ["Chairman & Principal Messages", "Founders Vision", "Journey Timeline Cards", "Section Manager"] },
+      { name: "Virtual Tour & Maps", icon: "🗺️", funcs: ["360° Virtual Campus Tour", "Building Information", "Block Types & Rooms", "Interactive Site Map"] },
+      { name: "Contact Form Processing", icon: "📥", funcs: ["Inquiry Ingestion", "Status Tracking (New/Replied/Closed)", "Admin Email Alerts", "Export to Excel"] }
+    ]
+  },
+  {
+    id: 12, name: "INTERACTIVE AI CHATBOT ENGINE", icon: "🤖", color: "#00F0FF",
+    tagline: "Automated 24/7 AI Institutional Assistant",
+    desc: "Intelligent AI chatbot with custom knowledgebase FAQs, unresolved inquiry fallback tracker, and one-click auto-conversion of student queries into FAQs.",
+    submodules: [
+      { name: "AI FAQ Knowledge Base", icon: "🧠", funcs: ["Intent & Keyword Builder", "Category Tagging", "Rich Text Answers", "Active Status Toggle"] },
+      { name: "Query Resolver", icon: "📩", funcs: ["Unanswered Queries Inbox", "One-Click Convert to FAQ", "Resolution Status Tracker", "User Analytics"] },
+      { name: "Chatbot System Settings", icon: "⚙️", funcs: ["Custom Assistant Name", "Welcome Greeting Message", "Primary Palette Config", "API Key Management"] },
+      { name: "Chat Widget", icon: "💬", funcs: ["Floating Web Widget", "Instant AJAX Search", "Lead Capture Popup", "Mobile Touch Optimized"] }
+    ]
+  },
+  {
+    id: 13, name: "POPUP & INQUIRY FORM BUILDER", icon: "📄", color: "#FB923C",
+    tagline: "Lead Capture & Campaign Management",
+    desc: "Design and launch modal popup campaigns, custom lead generation forms, custom CAPTCHA verification, and submission response tracking.",
+    submodules: [
+      { name: "Popup Campaign Builder", icon: "🖼️", funcs: ["Modal Title & Content", "Trigger Conditions (Delay/Scroll)", "Target URL Rules", "Active Toggle"] },
+      { name: "Form Customizer", icon: "✏️", funcs: ["Custom Form Fields", "Required Field Flags", "Input Type Selectors", "CTA Button Styling"] },
+      { name: "Security & CAPTCHA", icon: "🛡️", funcs: ["Dynamic Math CAPTCHA", "Session Verification", "Spam Protection", "IP Rate Limiting"] },
+      { name: "Submission Manager", icon: "📊", funcs: ["Lead Inbox", "Submission CSV Export", "Deletion Controls", "Notification Routing"] }
+    ]
+  },
+  {
+    id: 14, name: "ADVANCED SEO & META SUITE", icon: "🔎", color: "#22D3EE",
+    tagline: "Search Engine Optimization Engine",
+    desc: "Institutional SEO management with page-wise title & description mapping, bulk meta updates, automated XML sitemap generator, and robots.txt editor.",
+    submodules: [
+      { name: "Meta Tag Manager", icon: "🏷️", funcs: ["Page Meta Titles", "Meta Descriptions", "Focus Keywords", "Open Graph & Twitter Cards"] },
+      { name: "Automated Sitemap & Robots", icon: "🌐", funcs: ["Live sitemap.xml Generator", "Dynamic Route Indexer", "Robots.txt Rules Config", "SEO Health Audit"] },
+      { name: "Bulk SEO Sync", icon: "🔄", funcs: ["Sync All System Routes", "Mass Edit Interface", "Canonical URL Manager", "Structured Schema Data"] },
+      { name: "Global Site Keys", icon: "🔑", funcs: ["Google Analytics ID", "Tag Manager Tracking", "Search Console Verification", "Header/Footer Script Injector"] }
+    ]
+  },
+  {
+    id: 15, name: "THEME & STYLING ENGINE", icon: "🎨", color: "#FBBF24",
+    tagline: "Brand Identity & Theme Management",
+    desc: "Customize color palettes, typography, header layout, footer styling, and instant theme resetting across the entire web application.",
+    submodules: [
+      { name: "Preset Themes", icon: "🎭", funcs: ["Modern Midnight", "Classic Royal", "Emerald Academic", "Cyber Neon", "Custom Palette"] },
+      { name: "Live Customizer", icon: "🎛️", funcs: ["Primary Color Picker", "Accent & Text Colors", "Font Selector", "Border Radius Tweaker"] },
+      { name: "Header & Footer Config", icon: "📐", funcs: ["Top Bar Contact Info", "Social Icon Links", "Copyright Text", "Logo Placement Controls"] },
+      { name: "Theme Reset & Export", icon: "💾", funcs: ["One-Click Restore Default", "Export Theme Settings", "Import Custom Styling", "Active Theme Switcher"] }
+    ]
+  },
+  {
+    id: 16, name: "PUBLISHING QUEUE & SCHEDULER", icon: "⏰", color: "#34D399",
+    tagline: "Automated Content Release Scheduling",
+    desc: "Schedule future publish dates for events, announcements, blogs, and media updates with automated cron execution and bulk publishing management.",
+    submodules: [
+      { name: "Scheduled Items Queue", icon: "⏳", funcs: ["Pending Release Feed", "Model & ID Target", "Target Release Timestamp", "Queue Status Indicator"] },
+      { name: "Queue Operations", icon: "⚡", funcs: ["Publish Now Immediate Override", "Reschedule Release Date", "Cancel Scheduled Task", "Bulk Publish Action"] },
+      { name: "Automated Scheduler", icon: "🔄", funcs: ["Laravel Artisan Scheduler", "Cron Execution Logs", "Failed Release Alerts", "Auto-Archive Old Items"] },
+      { name: "Audit Log", icon: "📋", funcs: ["Publication Timeline", "Publisher Account Tag", "Release Action Log", "Historical Queue Archive"] }
+    ]
+  },
+  {
+    id: 17, name: "VISITOR GEOLOCATION & ANALYTICS", icon: "🗺️", color: "#E11D48",
+    tagline: "Live Visitor Traffic & Geolocation Tracking",
+    desc: "Interactive Leaflet map displaying real-time visitor locations, page view metrics, device breakdown, browser statistics, and geographic heatmaps.",
+    submodules: [
+      { name: "Interactive World Map", icon: "📍", funcs: ["Real-time Visitor Pins", "City & Country Aggregation", "IP Geolocation Lookup", "Interactive Map Zoom"] },
+      { name: "Page Visit Analytics", icon: "📈", funcs: ["Top Viewed Pages", "Session Duration", "Bounce Rate Counter", "Daily/Monthly Traffic Charts"] },
+      { name: "Detailed Visitor Logs", icon: "📝", funcs: ["IP Address", "User Agent & OS", "Referrer URLs", "Individual Session Timeline"] },
+      { name: "Data Export & Purge", icon: "🧹", funcs: ["CSV Visitor Logs Export", "Log Retention Policy", "Manual Purge Tool", "Privacy Anonymization"] }
+    ]
+  },
+  {
+    id: 18, name: "WEBSITE PERFORMANCE & HEALTH", icon: "⚡", color: "#0EA5E9",
+    tagline: "Speed Optimization & Cache Control",
+    desc: "Monitor server execution times, database query speeds, image compression ratios, browser cache headers, and one-click system optimization.",
+    submodules: [
+      { name: "Performance Dashboard", icon: "📊", funcs: ["Page Load Speed (ms)", "Database Query Count", "Memory Usage Metric", "HTTP Cache Hit Rate"] },
+      { name: "Image Optimization", icon: "🖼️", funcs: ["WebP Auto Conversion", "Lossless Compression", "Lazy Loading Engine", "CDN Asset Mirroring"] },
+      { name: "System Cache Management", icon: "🧹", funcs: ["Clear Route Cache", "Clear View Cache", "Config Purge", "OPcache Status"] },
+      { name: "PageSpeed API & Settings", icon: "⚙️", funcs: ["Google PageSpeed API Key", "Asset Minification Toggle", "Gzip/Brotli Compression", "Performance Logs"] }
+    ]
+  },
+  {
+    id: 19, name: "SECURITY, RBAC & AUDIT LOGS", icon: "🔒", color: "#4F46E5",
+    tagline: "Enterprise Security & Access Control",
+    desc: "Role-based admin access control, admin session timeout protection, detailed login audit trails, password security brokers, and HTTPS cache protection.",
+    submodules: [
+      { name: "User Management", icon: "👤", funcs: ["Admin User Creation", "Work Groups & Roles", "Permission Matrices", "Account Lockout Control"] },
+      { name: "Security Middleware", icon: "🛡️", funcs: ["Session Timeout Protection", "No-Cache Response Headers", "CSRF Tokens", "XSS Sanitation"] },
+      { name: "Audit & Login Logs", icon: "📄", funcs: ["Comprehensive Login Log", "IP Address Tracking", "Export Audit Trail", "Automated Log Purge"] },
+      { name: "Profile & Authentication", icon: "🔑", funcs: ["Password Security Policies", "Forgot Password Broker", "Two-Factor Auth Support", "Active Session List"] }
+    ]
+  },
+  {
+    id: 20, name: "RECYCLE BIN & DATA RECOVERY", icon: "🗑️", color: "#D97706",
+    tagline: "Multi-Model Soft Delete & Recovery Hub",
+    desc: "Institutional safety net for deleted content — restore deleted events, categories, blogs, or news items with complete audit logs before permanent purging.",
+    submodules: [
+      { name: "Unified Recycle Bin", icon: "♻️", funcs: ["Deleted Items Feed", "Model Type Filter", "Deleter User Information", "Deletion Timestamp"] },
+      { name: "One-Click Restoration", icon: "↩️", funcs: ["Instant Restoration to Live Site", "Relationship Intact Recovery", "Conflict Resolution", "Batch Restore"] },
+      { name: "Permanent Purge", icon: "💥", funcs: ["Individual Permanent Delete", "Bulk Empty Trash", "Confirmation Safeguards", "Storage Cleanup"] },
+      { name: "Category Recycle Bin", icon: "📁", funcs: ["Event Category Trash", "Sub-category Recovery", "Orphaned Items Alert", "Recycle Audit Records"] }
+    ]
+  },
+  {
+    id: 21, name: "AUTOMATED CLOUD BACKUP & S3 METRICS", icon: "☁️", color: "#2563EB",
+    tagline: "Enterprise Backup & Cloud Asset Metrics",
+    desc: "Real-time AWS S3 bucket storage tracking, automated database export downloads, media backup archiving, and system disaster recovery.",
+    submodules: [
+      { name: "S3 Storage Metrics", icon: "💾", funcs: ["Total S3 Bytes Used", "Object Count Statistics", "Bandwidth Monitoring", "Storage Cost Insights"] },
+      { name: "One-Click School Backup", icon: "📦", funcs: ["Database SQL Exporter", "Media Files Zip Generation", "Secure Backup Download", "Automated Nightly Dumps"] },
+      { name: "Cloud Sync", icon: "🔄", funcs: ["DigitalOcean Spaces / AWS S3 Mirroring", "Sync Status Counter", "Missing File Recovery", "Direct Bucket Download"] },
+      { name: "Disaster Recovery", icon: "🚨", funcs: ["One-Click Restore Tool", "Database Schema Check", "File Integrity Inspector", "System Backup Logs"] }
+    ]
+  },
+  {
+    id: 22, name: "USER MANUAL & ADMIN FEEDBACK", icon: "📖", color: "#059669",
+    tagline: "Embedded In-App Admin Documentation",
+    desc: "Built-in step-by-step documentation manual for administrators with module guides, search capability, admin feedback collection, and ticket status resolution.",
+    submodules: [
+      { name: "Documentation Hub", icon: "📚", funcs: ["Module-Wise Admin Guides", "Step-by-Step Screenshots", "Quick Reference Cards", "Workflow Diagrams"] },
+      { name: "Guide Management", icon: "📝", funcs: ["Create / Edit Guides", "Markdown Support", "Rich Media Embeds", "Version Control"] },
+      { name: "Feedback Collector & Tickets", icon: "💬", funcs: ["Admin User Feedback Form", "Helpful / Unhelpful Ratings", "Ticket Status Workflow (Pending/Resolved)", "Resolution Remarks"] },
+      { name: "Auto Refresh & Search", icon: "🔍", funcs: ["Documentation Indexing", "Instant Text Search", "One-Click Feed Refresh", "Export PDF Guides"] }
+    ]
+  },
+  {
+    id: 23, name: "SOCIAL MEDIA FEED INTEGRATION", icon: "📲", color: "#EC4899",
+    tagline: "Social Content Synchronization Hub",
+    desc: "Connect official Instagram, Facebook, and YouTube channels — fetch posts, review pending content, approve/reject items, and display social streams on frontend.",
+    submodules: [
+      { name: "Feed Ingestion", icon: "📥", funcs: ["Fetch Social Posts", "Instagram API Connector", "YouTube Video Fetcher", "Custom URL Store"] },
+      { name: "Content Moderation", icon: "🛡️", funcs: ["Pending Approval Queue", "One-Click Approve / Reject", "Post Preview Grid", "Filtered Out Content"] },
+      { name: "Feed Display Widget", icon: "📱", funcs: ["Responsive Social Grid", "Direct Link to Post", "Embedded Video Player", "Like/Share Counter"] },
+      { name: "Sync Configuration", icon: "⚙️", funcs: ["Auto-Sync Interval", "Channel Access Tokens", "Max Posts Displayed", "Cache TTL Rules"] }
+    ]
+  },
+  {
+    id: 24, name: "CIRCULAR & DOCUMENT REPOSITORY", icon: "📁", color: "#8B5CF6",
+    tagline: "Digital Document Management System",
+    desc: "Centralized repository for school circulars, academic notices, syllabus PDFs, admission guidelines, and parent information booklets.",
+    submodules: [
+      { name: "Document Master", icon: "📄", funcs: ["Upload PDF / Office Documents", "Circular Title & Category", "Academic Year Tag", "Target Audience Filter"] },
+      { name: "Order & Reorder", icon: "🔀", funcs: ["Visual Document Sequence", "Pin Important Notices", "Active / Inactive Status", "File Size Display"] },
+      { name: "Document Download Hub", icon: "⬇️", funcs: ["Public Download Center", "Category Tabs", "Fast Direct Links", "Mobile Viewport PDF Viewer"] },
+      { name: "Security & Archiving", icon: "🔒", funcs: ["Restricted Document Links", "Auto-Archive Expired Notices", "Download Counter", "Version History"] }
+    ]
+  },
+  {
+    id: 25, name: "ACADEMIC & CURRICULUM DELIVERY", icon: "📚", color: "#10B981",
+    tagline: "Holistic Educational Syllabus Hub",
+    desc: "Complete curriculum showcase covering Montessori, Kindergarten, Primary, Middle, Senior School, i5 Academy, and National Education Policy (NEP 2020) compliance.",
+    submodules: [
+      { name: "Grade Level Modules", icon: "🏫", funcs: ["Montessori & Early Years", "Kindergarten Curriculum", "Primary School (Grades 1-5)", "Middle & Senior School"] },
+      { name: "Enrichment Programmes", icon: "💡", funcs: ["i5 Academy Excellence", "Co-Scholastic Syllabi", "STEM & Robotics Workshops", "Language Academics"] },
+      { name: "NEP 2020 Integration", icon: "🇮🇳", funcs: ["Multidisciplinary Pedagogy", "Skill Development Tracks", "Assessment Guidelines", "Compliance Documentation"] },
+      { name: "Learning Resources", icon: "📑", funcs: ["Syllabus Breakdown PDFs", "Subject Recommendations", "Teacher Directories", "Academic Calendar Link"] }
+    ]
+  },
+  {
+    id: 26, name: "CAMPUS FACILITIES & INFRASTRUCTURE", icon: "🏫", color: "#3B82F6",
+    tagline: "Modern Campus Infrastructure Showcase",
+    desc: "Comprehensive campus directory highlighting state-of-the-art laboratories, sports arenas, digital classrooms, auditorium, library, and transportation routes.",
+    submodules: [
+      { name: "Facility Directory", icon: "🏛️", funcs: ["Science & Computer Labs", "Digital Smart Classrooms", "Library & Reading Rooms", "Sports Complex & Grounds"] },
+      { name: "Facility Item Manager", icon: "🛠️", funcs: ["Facility Title & Description", "Icon Selection", "High-Res Gallery Upload", "Display Sequence"] },
+      { name: "Transportation Routes", icon: "🚌", funcs: ["Route Numbers & Maps", "Bus Stops & Timings", "Safety Features", "Transport Manager Contact"] },
+      { name: "Campus Building Info", icon: "🏢", funcs: ["Block Types & Floor Plans", "Classroom Allocations", "Administrative Wings", "Safety & Security Specs"] }
+    ]
+  },
+  {
+    id: 27, name: "ENTERPRISE ARCHITECTURE & CLOUD INFRASTRUCTURE", icon: "⚙️", color: "#8B5CF6",
+    tagline: "High-Availability System Core & Storage",
+    desc: "Robust enterprise backend engine powered by optimized MySQL database indexing, RESTful API endpoints, DigitalOcean Spaces CDN integration, and 24/7 health monitoring.",
+    submodules: [
+      { name: "Database Architecture", icon: "🗄️", funcs: ["MySQL InnoDB Engine", "Query Optimization", "Transaction Isolation", "Multi-Table Schemas"] },
+      { name: "API & Integration Hub", icon: "🔌", funcs: ["RESTful API Endpoints", "JSON Data Transformers", "Webhook Event Triggers", "CORS Policy Security"] },
+      { name: "High-Availability Cloud", icon: "☁️", funcs: ["DigitalOcean Spaces CDN", "AWS S3 Assets Engine", "TLS/SSL 256-bit Encryption", "HTTP/2 Acceleration"] },
+      { name: "Disaster Recovery Suite", icon: "🚨", funcs: ["Nightly Auto Backups", "Point-in-Time Restores", "Integrity Checksums", "System Status Logs"] }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  BACKGROUND & CANVAS ANIMATION SETUP
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildBg() {
+  const bg = document.getElementById('animBg');
+  const colors = ["#3B82F6", "#10B981", "#8B5CF6", "#F59E0B", "#06B6D4", "#F43F5E", "#00F0FF"];
+  colors.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'bg-orb';
+    const s = 220 + Math.random() * 380;
+    d.style.cssText = `width:${s}px;height:${s}px;background:${c};left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${i * 2.5}s;animation-duration:${28 + i * 3}s`;
+    bg.appendChild(d);
+  });
+
+  const sb = document.getElementById('starsBg');
+  for (let i = 0; i < 130; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 5}s;animation-duration:${2 + Math.random() * 4}s`;
+    sb.appendChild(s);
+  }
+}
+
+// Interactive particle network canvas
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.radius = Math.random() * 1.5 + 0.5;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - dist / 120)})`;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  SLIDE BUILDER
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildSlides() {
+  const container = document.getElementById('slides-container');
+  const allSlides = [];
+
+  // 1. TITLE SLIDE
+  const t = document.createElement('div');
+  t.className = 'slide active';
+  t.dataset.index = 0;
+  t.innerHTML = `
+    <div class="title-slide" style="animation:fadeUp .8s both">
+      <div class="logo-ring-wrap">
+        <div class="logo-outer-ring"></div>
+        <div class="logo-inner-ring"></div>
+        <div class="logo-circle">
+          <img src="https://knrint-website.blr1.cdn.digitaloceanspaces.com/KNR-WEBSITE/2026/product_logos/Webcorebg.png" onerror="this.src='img/webcore_logo.png'" alt="WEBcore Logo" class="webcore-logo-img"/>
+        </div>
+      </div>
+      <div class="title-expand">
+        <span style="font-size:clamp(.7rem,1.2vw,.88rem);letter-spacing:.22em;color:rgba(0,240,255,.9);font-weight:800;text-transform:uppercase;animation:fadeUp .6s .1s both;display:block;margin-bottom:.4rem">Institutional Content Management & Enterprise Web Platform</span>
+        <div class="tagline">THE COMPLETE WEB & CMS SOLUTION</div>
+        <div class="subtitle">Unified &bull; Intelligent &bull; High Performance &bull; Enterprise Scalable</div>
+        <div style="width:220px;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent);margin:1rem auto"></div>
+        <div class="stats-row">
+          <div class="title-stat"><div class="num">27</div><div class="lbl">Core Modules</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">270+</div><div class="lbl">Features</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">100%</div><div class="lbl">Responsive</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">360°</div><div class="lbl">Coverage</div></div>
+        </div>
+        <div style="display:flex;gap:.6rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;animation:fadeUp 1s 1.2s both">
+          <span class="pill-badge" style="--pc:var(--electric)">🌐 Web Visitors</span>
+          <span class="pill-badge" style="--pc:var(--emerald)">🏫 School Admins</span>
+          <span class="pill-badge" style="--pc:var(--amber)">🤖 AI Assistants</span>
+          <span class="pill-badge" style="--pc:var(--purple)">📊 Analytics</span>
+          <span class="pill-badge" style="--pc:var(--rose)">🔒 Enterprise RBAC</span>
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(t);
+  allSlides.push(t);
+
+  // 2. OVERVIEW SLIDE
+  const ov = document.createElement('div');
+  ov.className = 'slide';
+  ov.dataset.index = 1;
+  ov.innerHTML = `
+    <div class="overview-slide">
+      <div class="slide-header">
+        <div class="eyebrow">Platform Architecture Overview</div>
+        <h2 style="background:linear-gradient(135deg,#fff,var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+          27 Core Platform Modules
+        </h2>
+        <p style="color:rgba(255,255,255,.65);margin-top:.3rem;font-size:.9rem">Click any module card to inspect detailed features & capabilities</p>
+      </div>
+      <div class="modules-grid">
+        ${modules.map((m, i) => `
+          <div class="mod-chip" style="--chip-color:${m.color}" onclick="goToSlide(${i + 2})" title="${m.name}">
+            <div class="chip-icon">${m.icon}</div>
+            <div class="chip-name">${m.name}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  container.appendChild(ov);
+  allSlides.push(ov);
+
+  // 3. MODULE DEEP DIVE SLIDES (Slides 2 to 28)
+  modules.forEach((m, i) => {
+    const s = document.createElement('div');
+    s.className = 'slide';
+    s.dataset.index = i + 2;
+    const numCols = m.submodules.length <= 2 ? 'grid-1' : m.submodules.length <= 4 ? 'grid-2' : 'grid-3';
+
+    s.innerHTML = `
+      <div class="module-slide">
+        <div class="mod-glow" style="background:${m.color}"></div>
+        <div class="mod-header">
+          <div class="mod-icon-wrap" style="background:linear-gradient(135deg,${m.color},${m.color}88)">
+            <span>${m.icon}</span>
+          </div>
+          <div class="mod-title-block">
+            <div class="mod-number" style="color:${m.color}">MODULE ${String(m.id).padStart(2, '0')} / 27</div>
+            <div class="mod-title" style="background:linear-gradient(135deg,#fff,${m.color});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${m.name}</div>
+            <div class="mod-tagline">${m.tagline}</div>
+          </div>
+        </div>
+        <div class="mod-description" style="border-color:${m.color}">${m.desc}</div>
+        <div class="submodules-grid ${numCols}">
+          ${m.submodules.map((sub) => `
+            <div class="submodule-card">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;background:${m.color}"></div>
+              <div class="sub-name" style="color:${m.color}">
+                <span>${sub.icon}</span> ${sub.name}
+              </div>
+              <div class="funcs-wrap">
+                ${sub.funcs.map(f => `
+                  <span class="func-tag" style="border-color:${m.color}44" onclick="openFeatureModal('${f.replace(/'/g, "\\'")}', '${sub.name.replace(/'/g, "\\'")}', '${m.name.replace(/'/g, "\\'")}')">
+                    ${f}
+                  </span>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    container.appendChild(s);
+    allSlides.push(s);
+  });
+
+  // 4. CLOSER SLIDE (Slide 29 -> Total 30 Slides)
+  const cl = document.createElement('div');
+  cl.className = 'slide';
+  cl.dataset.index = modules.length + 2;
+  cl.innerHTML = `
+    <div class="closer-slide">
+      <div style="font-size:.85rem;text-transform:uppercase;letter-spacing:.22em;color:var(--neon);font-weight:800;margin-bottom:.8rem">Complete WEBcore Architecture</div>
+      <h2>Ready to Experience WEBcore?</h2>
+      <div class="sub">Empowering Educational Institutions with Modern Web Excellence</div>
+      <div class="closer-modules-list">
+        ${modules.map((m, i) => `<span class="closer-chip" style="border-color:${m.color}66;color:${m.color}" onclick="goToSlide(${i + 2})">${m.icon} ${m.name}</span>`).join('')}
+      </div>
+      <div class="cta-wrap">
+        <button class="cta-btn cta-website" onclick="window.open('https://webcore.rescom.in/', '_blank')">🌐 Visit WEBcore Website</button>
+        <button class="cta-btn cta-admin" onclick="window.open('https://webcore.rescom.in/admin/login', '_blank')">🔐 Visit WEBcore Admin Portal</button>
+        <button class="cta-btn cta-primary" onclick="goToSlide(0)">↺ Back to Start</button>
+        <button class="cta-btn cta-secondary" onclick="goToSlide(1)">📱 View All 27 Modules</button>
+      </div>
+      <div style="margin-top:2.2rem;color:rgba(255,255,255,.45);font-size:.88rem;font-weight:600">
+        27 Core Modules &nbsp;&bull;&nbsp; 270+ Features &nbsp;&bull;&nbsp; Automated AI Chatbot &nbsp;&bull;&nbsp; S3 Cloud Sync &nbsp;&bull;&nbsp; <span style="color:var(--neon)">WEBcore CMS</span>
+      </div>
+    </div>`;
+  container.appendChild(cl);
+  allSlides.push(cl);
+
+  return allSlides;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  NAVIGATION DOTS BUILDER
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildDots(total) {
+  const wrap = document.getElementById('navDots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.title = i === 0 ? 'Title' : i === 1 ? 'Overview' : i === total - 1 ? 'Closer' : `Module ${i - 1}`;
+    d.onclick = () => goToSlide(i);
+    d.dataset.i = i;
+    if (total > 12 && i > 1 && i < total - 1 && (i - 2) % 2 !== 0) {
+      d.style.display = 'none'; // Compact dots spacing
+    }
+    wrap.appendChild(d);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  SLIDE CONTROLLER & AUTOPLAY LOGIC
+// ═══════════════════════════════════════════════════════════════════════════════
+let current = 0;
+let slides = [];
+let total = 0;
+let autoplayTimer = null;
+let isPlaying = false;
+let elapsedSec = 0;
+let timerTick = null;
+
+function goToSlide(n, dir = 1) {
+  if (n < 0 || n >= total) return;
+  const prev = slides[current];
+  prev.style.opacity = '0';
+  prev.style.transform = dir > 0 ? 'translateX(-80px)' : 'translateX(80px)';
+  prev.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    prev.style.transition = 'none';
+    prev.style.transform = '';
+    prev.style.transition = '';
+  }, 600);
+
+  current = n;
+  const curr = slides[current];
+  curr.style.opacity = '0';
+  curr.style.transform = dir > 0 ? 'translateX(80px)' : 'translateX(-80px)';
+  curr.style.transition = 'none';
+  curr.style.pointerEvents = 'all';
+
+  requestAnimationFrame(() => {
+    curr.style.transition = 'opacity .6s ease, transform .6s cubic-bezier(.4,0,.2,1)';
+    curr.style.opacity = '1';
+    curr.style.transform = 'translateX(0)';
+  });
+
+  updateControls();
+}
+
+function updateControls() {
+  document.getElementById('slideCounter').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((current + 1) / total) * 100}%`;
+
+  document.querySelectorAll('.dot').forEach((d, idx) => {
+    d.classList.toggle('active', idx === current);
+  });
+}
+
+function toggleAutoplay() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('autoplayBtn');
+  const icon = document.getElementById('playIcon');
+  const txt = document.getElementById('playText');
+
+  if (isPlaying) {
+    btn.classList.add('active');
+    icon.textContent = '❚❚';
+    txt.textContent = 'Pause';
+    autoplayTimer = setInterval(() => {
+      if (current < total - 1) {
+        goToSlide(current + 1, 1);
+      } else {
+        goToSlide(0, 1);
+      }
+    }, 6000);
+  } else {
+    btn.classList.remove('active');
+    icon.textContent = '▶';
+    txt.textContent = 'Auto';
+    clearInterval(autoplayTimer);
+  }
+}
+
+function startTimer() {
+  timerTick = setInterval(() => {
+    elapsedSec++;
+    const m = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+    const s = String(elapsedSec % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  FEATURE INSPECTOR & SEARCH MODALS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Detailed Feature Explanations Dictionary for All 26 Platform Modules & 260+ Features
+const FEATURE_DESCRIPTIONS = {
+  // Module 1: Website Pages & Dynamic CMS
+  "History Timeline": "Interactive milestone timeline highlighting institutional founding dates, expansions, accreditation achievements, and legacy records.",
+  "Vision & Mission Statements": "Displays core institutional principles, academic vision, and educational mission with dynamic section styling and rich media embeds.",
+  "Leadership & Management Profiles": "Showcase founder, principal, chairman, and key faculty profiles with bio cards, credentials, and executive quotes.",
+  "Resource Links": "Categorized links to academic portals, digital libraries, institutional guidelines, and student/parent resources.",
+  "Credentia & Affiliations": "Display board affiliation certificates, CBSE/ICSE accreditation details, quality badges, and institutional credentials.",
+  "Privacy Policy": "Manages institutional compliance, student data privacy standards, GDPR/DPDP disclosures, and security parameters with version control and draft/published toggles.",
+  "Terms & Conditions": "Defines website usage rules, digital asset copyrights, institutional liability parameters, and user conduct guidelines across all public endpoints.",
+  "Refund Policy": "Outlines fee refund rules, fee concession processing parameters, cancellation timelines, and audit compliance for online payment gateways.",
+  "Custom Policy Pages": "Enables administrators to publish custom governance guidelines, safety protocols, and institutional charters with rich media formatting.",
+  "Draft/Publish Workflow": "Multi-tier content approval workflow allowing editors to draft, review, and preview updates before publishing live to the public site without downtime.",
+  "Home Facility Items": "Highlight featured campus facility highlights directly on the homepage with custom icons and detail links.",
+  "Campus Infrastructure": "Detailed breakdown of physical and digital campus infrastructure, smart classrooms, laboratories, and green campus initiatives.",
+  "Facility Image Galleries": "Multi-image visual galleries showcasing laboratory equipment, sports arenas, library collections, and auditorium views.",
+  "Custom Detail Slugs": "SEO-friendly customizable URL slugs for all dynamic pages, facility showcases, and institutional landing pages.",
+  "School Name & Code": "Configures institutional name, official school affiliation code, branch identifier, and global header metadata.",
+  "Favicon & Logo Config": "Manage official school logos, high-resolution header branding, mobile app icons, and browser favicons.",
+  "Affiliation Specs": "Document board affiliation numbers, valid operating licenses, accreditation tiers, and regulatory compliance data.",
+  "Contact Info & Maps": "Global contact phone numbers, official email addresses, campus location coordinates, and embedded interactive Google Maps.",
+
+  // Module 2: Homepage Carousel & Header Engine
+  "Hero Image Upload": "High-resolution banner image uploader supporting auto WebP conversion, mobile crop optimization, and retina display support.",
+  "Slide Sequence Reordering": "Visual drag-and-drop slide sequence management to prioritize featured announcements and upcoming events on the hero slider.",
+  "Active/Inactive Toggle": "One-click instant visibility toggle to hide seasonal banners or expired promotions without deleting the slide assets.",
+  "Slide Caption & CTA Links": "Add rich headline text, sub-descriptions, and direct call-to-action button links to hero slider banners.",
+  "Section Drag-and-Drop Order": "Interactive layout manager allowing admins to rearrange homepage sections (Hero, About, Events, Facilities, Testimonials) in real time.",
+  "Section Visibility Controls": "Hide or show specific homepage sections dynamically based on institutional campaigns or seasonal events.",
+  "Layout Presets": "Switch between pre-configured homepage layout designs (Modern Grid, Classic Hero, Academic Spotlight, Minimalist).",
+  "Section Background Config": "Customize background colors, ambient gradient overlays, pattern textures, and dark/light modes per homepage section.",
+  "Admissions Home Header": "Custom banner title, subtitle, and imagery dedicated to promoting annual student enrollment on the homepage.",
+  "Learning Home Header": "Featured header section highlighting academic excellence, curriculum strengths, and innovative learning methodologies.",
+  "Our Campus Home Header": "Dedicated visual showcase introducing campus life, student facilities, and physical infrastructure.",
+  "Custom Taglines": "Create memorable promotional taglines and motto banners displayed across major section headers.",
+  "Home Facility Cards": "Interactive facility highlight cards featuring custom icons, quick stats, and direct detail links.",
+  "Icon Customizer": "Select from an extensive library of vector icons to represent campus facilities and academic features.",
+  "Display Sequence": "Precise numerical order controller for sorting cards, features, and facility highlights.",
+  "Click-through URLs": "Custom redirection links taking visitors from homepage highlights directly to detailed interior pages.",
+
+  // Module 3: Events & Activities CMS
+  "Category Creation": "Configure dynamic event categories with custom slugs, display sequences, hero banner colors, and sub-category relationships.",
+  "Display Order Config": "Set the exact sequence for event categories and activities across main navigation menus and sidebars.",
+  "Category Soft-Delete": "Move inactive event categories to the recycle bin without breaking existing event links or historical archives.",
+  "Sub-Category Mapping": "Nest sub-categories (e.g. Science Club under Clubs, Inter-House Sports under School Programs) for structured navigation.",
+  "Class Assembly Management": "Track grade-wise class assembly schedules, themes, student participation lists, and high-resolution photo galleries.",
+  "Class-Wise Filter": "Filter assemblies and activities by specific grades (Kindergarten, Primary, Middle, Senior) for targeted browsing.",
+  "Date & Theme Entry": "Record event dates, assembly themes, guest speaker details, and special morning program schedules.",
+  "Assembly Photo Gallery": "Dedicated photo album for each class assembly featuring event highlights, student performances, and award presentations.",
+  "Club Activities": "Document regular club sessions (Robotics, Drama, Debate, Eco-Club, Coding) with activity logs and student achievements.",
+  "Association Meet Reports": "Detailed reports and summaries of parent-teacher association meets, alumni gatherings, and committee conferences.",
+  "Student Coordinators": "Highlight student leaders, house captains, and event student coordinators with photo profiles.",
+  "Event Archiving": "Automatically archive past events while keeping them accessible through year-wise searchable archives.",
+  "Category & Sub-Category Binding": "Link generic campus events dynamically to multi-tier category structures for automated listing.",
+  "Featured Images": "Assign high-impact cover images to events for display on homepage news feeds and social share previews.",
+  "Event Stats Counter": "Track total page views, attendee interest, and visitor engagement statistics per event.",
+  "Category Relocation": "Move an existing event seamlessly between categories (e.g. from School Program to Generic Event) with intact assets.",
+
+  // Module 4: Inter-School Fest Management
+  "Fest Title & Theme": "Configure annual fest titles, theme graphics, tagline mottoes, and host campus details.",
+  "Date & Venue Setup": "Set multi-day fest schedules, opening ceremony timings, campus venue locations, and auditorium bookings.",
+  "Banner & Poster Upload": "High-resolution poster and banner uploader for generating fest marketing banners and downloadable flyers.",
+  "Fest Landing Page Generator": "Instantly generates a dedicated, high-impact landing page for inter-school competitive fests with countdown timers and event rules.",
+  "Event Categories": "Organize fest competitions into distinct domain categories (Tech Fest, Cultural Fest, Sports Meet, Science Symposium).",
+  "Rules & Guidelines": "Publish detailed eligibility criteria, team sizes, judging rubrics, code of conduct, and disqualification rules.",
+  "Timing & Venue Slots": "Schedule individual event time slots, stage allocations, hall numbers, and reporting times.",
+  "Multi-Image Upload": "Upload dozens of fest photos simultaneously with automated thumbnail generation and compression.",
+  "Event-Wise Photo Sorting": "Categorize photo albums by specific sub-events (e.g. Battle of the Bands, Quiz Bowl, Robotics Arena).",
+  "High-Res Image Viewer": "Responsive lightbox modal allowing visitors to inspect fest photos in full resolution with touch swipe support.",
+  "Registration Form Integration": "Direct link to online registration forms for participating external schools and student delegations.",
+  "Rules PDF Download": "One-click downloadable PDF brochure containing complete fest regulations, entry forms, and route maps.",
+  "Contact Details": "Dedicated helpdesk phone numbers, email contacts, and campus direction maps for fest attendees.",
+  "Live Schedule Ticker": "Real-time ticker displaying ongoing events, upcoming competition calls, and live winner announcements.",
+
+  // Module 5: Announcements & Tickers
+  "Scrolling Text Alerts": "High-priority marquee news ticker fixed across website headers with real-time speed controls, active status toggles, and click-through links.",
+  "Speed & Direction Controls": "Adjust scrolling speed, marquee direction (left/right), pause-on-hover behavior, and ticker font sizes.",
+  "Click-through Links": "Attach internal page URLs or external document links to ticker alerts for immediate visitor redirection.",
+  "Ticker Active Status": "Toggle headline alerts on or off instantly during emergencies, exam results releases, or holiday notices.",
+  "Priority Pin to Top": "Pin critical announcements (school closures, emergency alerts, result dates) permanently to the top of the feed.",
+  "Publish & Expiry Date": "Schedule automated release and expiration dates so temporary notices disappear automatically when no longer relevant.",
+  "Target Audience Tags": "Tag notices for specific recipient groups (Parents, Students, Staff, Public Visitors) for filtered notice views.",
+  "Rich Text Announcements": "Format notices with bold highlights, colored text, bullet points, embedded links, and downloadable attachments.",
+  "YouTube/Vimeo Embeds": "Embed official video announcements, campus event streams, and principal speeches directly into responsive modal video players.",
+  "Thumbnail Customizer": "Upload custom video cover thumbnails to maintain consistent visual branding across announcement feeds.",
+  "Video Title & Description": "Add descriptive titles, timestamps, author metadata, and summary captions to embedded video announcements.",
+  "Modal Video Player": "Theater-mode lightbox video player providing zero-distraction playback without sending users away from the site.",
+  "Searchable History": "Comprehensive search interface allowing visitors to look up historical announcements by keyword or date range.",
+  "Tagging & Filtering": "Filter archived notices by category (Academic, Sports, Holidays, Administrative, Transportation).",
+  "Auto-Archiving Rules": "System automation that transitions expired notices into searchable historical archives automatically.",
+  "Public/Internal Visibility": "Control whether an announcement is visible to general public visitors or restricted to internal portals.",
+
+  // Module 6: Online Admission & Registration
+  "Step-by-Step Flow Builder": "Customize the multi-step online admission form sequence (Personal Info -> Parent Details -> Previous School -> Document Uploads).",
+  "Step Descriptions": "Add helpful guidance notes and required document checklists for each step of the registration workflow.",
+  "Active Step Toggle": "Enable or disable specific admission stages dynamically as registration windows open or close.",
+  "Field Customizer": "Configure custom form input fields, dropdown choices, validation regex rules, and mandatory field requirements.",
+  "Student Personal Details": "Capture full name, date of birth, blood group, mother tongue, nationality, religion, and medical information.",
+  "Parent Information": "Detailed form fields for father/mother/guardian occupation, contact details, annual income, and address.",
+  "Previous Academic Records": "Collect previous school name, grade completed, marks transcripts, transfer certificate details, and achievements.",
+  "Document Uploads": "Secure file uploader for passport photos, birth certificates, previous marksheets, Aadhaar cards, and address proofs.",
+  "Class-Wise Criteria": "Publish age eligibility cut-offs, prerequisite academic scores, and entry requirements per grade level.",
+  "Syllabus Download": "Provide downloadable entrance assessment syllabus PDFs to help applicants prepare for admission tests.",
+  "Entrance Exam Dates": "Display exam dates, reporting times, test durations, hall numbers, and required stationery checklists.",
+  "Venue & Instructions": "Detailed instructions regarding campus entry protocols, parking guidelines, and parent waiting areas.",
+  "Category FAQs": "Frequently asked questions organized by category (Fee Structure, Transport Routes, Age Limits, Selection Process).",
+  "Quick Search": "Search bar allowing parents to quickly find specific admission answers without browsing long lists.",
+  "Parent Support Links": "Quick links to helpdesk WhatsApp contacts, admission officer emails, and campus visit appointment booking.",
+  "Fee Structure Overview": "Comprehensive breakdown of tuition fees, admission fees, store items, and installment payment schedules.",
+
+  // Module 7: Achievements & Scholarships Hub
+  "Grade 10 Centum Lists": "Document Grade 10 Board Exam perfect 100/100 scorers with student photos, subject names, and scores.",
+  "Grade 12 Centum Lists": "Showcase Grade 12 Board Exam toppers and subject centum achievers across Science, Commerce, and Humanities.",
+  "Subject-Wise Toppers": "Highlight top-performing students per subject discipline with academic honor roll badges.",
+  "Year-Wise Filters (2020-2026)": "Filter board exam achievements and centum records across historical academic years.",
+  "Annual Merit Awards": "Manage annual academic merit scholarship recipients, award amounts, and institutional certificates.",
+  "Scholarship Eligibility": "Publish criteria guidelines, cut-off percentages, and application forms for institutional scholarships.",
+  "Awardee Photos": "Upload high-resolution student portraits for merit scholarship holders and annual award winners.",
+  "PDF Reports": "Generate downloadable PDF achievement booklets for annual prize distribution days.",
+  "Prize Distribution Lists": "Organize annual day prize distribution schedules, award categories, and student nominee rosters.",
+  "Annual Day Awards": "Record major trophy winners (Best All-Rounder, Student of the Year, House Champion Trophies).",
+  "Sports & Cultural Trophies": "Track inter-school sports medals, state/national tournament trophies, and cultural festival victories.",
+  "Category Badges": "Assign visual honor badges (Academic, Sports, Leadership, Arts, Science) to achievement cards.",
+  "Human Interest Articles": "Feature in-depth story articles celebrating exceptional student accomplishments and overcome challenges.",
+  "Inspirational Profiles": "Highlight faculty achievements, research papers, national awards, and master teacher recognitions.",
+  "Student/Staff Interviews": "Publish Q&A interviews with toppers, head boys/girls, and distinguished alumni mentors.",
+  "Featured Hero Banner": "Showcase flagship achievement stories on top hero banners with full-width graphics.",
+
+  // Module 8: Alumni Network & Placements
+  "Yearly Meet Records (2019-2025)": "Document annual alumni reunion events, attendee rosters, photo albums, and keynote speeches.",
+  "Photo Highlights": "Curated image gallery of alumni gatherings, networking dinners, and campus campus visits.",
+  "Event Summary": "Executive summary reports detailing alumni meet discussions, alumni association elections, and fund contributions.",
+  "Alumni Registration Link": "Direct registration portal for graduating students and past alumni to join the official alumni network.",
+  "Higher Education Admissions": "Track top international and national university admissions (IIT, IIM, Ivy League, Oxford, NUS).",
+  "Global University Admits": "Interactive map and directory showcasing global universities where alumni are currently studying.",
+  "Career Placements": "Document alumni career achievements, top recruiting companies, and industry leadership roles.",
+  "Batch-Wise Filters": "Filter alumni profiles and placement statistics by graduation batch year (2010 through 2025).",
+  "Alumni Spotlight": "Monthly featured profile showcasing outstanding alumni contributions in medicine, engineering, arts, and business.",
+  "Guest Speaker Profiles": "Highlight alumni who visit campus to conduct student workshops, career counselling, and guest lectures.",
+  "Mentorship Connections": "Connect current senior students with alumni mentors for higher education and career guidance.",
+  "Testimonial Videos": "Video testimonials from alumni sharing their school memories and foundation for future success.",
+  "Graduation Year Master": "System master dictionary managing graduation batches, house affiliations, and alumni registration IDs.",
+  "Field of Study Tagging": "Categorize alumni profiles by professional domain (Technology, Healthcare, Law, Finance, Public Service).",
+  "Contact Preferences": "Manage alumni privacy settings, email newsletter subscriptions, and directory visibility preferences.",
+  "Verified Profiles": "Blue badge verification system for authenticated alumni account credentials.",
+
+  // Module 9: Campus Media & Gallery Manager
+  "Year-Wise Filtering": "Filter photo albums by academic year (2020 through 2026) for organized media browsing.",
+  "Album Category Tags": "Tag albums by domain (Sports Day, Annual Day, Science Exhibition, Excursions, Infrastructure).",
+  "Cover Photo Selector": "Choose high-impact hero cover photos to represent each photo gallery album.",
+  "Publish Status": "Control album visibility (Draft, Public, Internal, Archived) with one-click toggles.",
+  "Bulk File Uploader": "Drag-and-drop multi-file uploader supporting simultaneous upload of up to 100 high-resolution images.",
+  "Automatic Image Compression": "Automatic server-side compression converting heavy JPEG/PNG images into lightweight WebP format.",
+  "Thumbnail Generator": "Generate optimized square and landscape image thumbnails for ultra-fast page grid loading.",
+  "AWS S3 Integration": "Automated cloud storage mirroring for media assets, photo galleries, and PDF circulars with CDN delivery.",
+  "Visual Grid Reordering": "Reorder photos within an album using drag-and-drop visual grid controls.",
+  "Instant Sequence Update": "Real-time AJAX order persistence saving image layout changes immediately without page reload.",
+  "Featured Badge Selector": "Mark key photos with a 'Featured' badge to highlight them on homepage carousels and news feeds.",
+  "Caption Editor": "Add detailed captions, photo credits, and event location notes to individual gallery images.",
+  "Responsive Modal Viewer": "Touch-friendly lightbox popup displaying full-screen images with zoom capabilities.",
+  "Touch Swipe Support": "Mobile swipe gesture support allowing smartphone users to flip through photos effortlessly.",
+  "AJAX Load More": "Infinite scroll or AJAX pagination loading additional images seamlessly without refreshing the browser.",
+  "High-Res Asset Delivery": "Serves optimized high-resolution images tailored to visitor device screen density and bandwidth.",
+
+  // Module 10: Blogs & Article Engine
+  "Rich Text Editor": "WYSIWYG article editor supporting headings, blockquotes, code snippets, tables, and media embeds.",
+  "Category Selection": "Assign articles to specific editorial categories (Principal's Blog, Student Corner, STEM Insights, Sports Beat).",
+  "Author Assignment": "Link articles to staff members, guest authors, or student editorial board members with author bio cards.",
+  "Slug Generator": "Auto-generate clean, SEO-optimized URL slugs from article titles with manual edit options.",
+  "Embedded In-Article Images": "Insert inline photo galleries and captioned images directly inside article body paragraphs.",
+  "Image Deletion": "Manage and delete inline article images directly from the article editor interface.",
+  "Inline Alignment": "Set image alignment (Left, Center, Right, Full-Width) with text wrapping controls.",
+  "Draft / Published / Archived": "Complete state management workflow allowing articles to be drafted, reviewed, published, or retired.",
+  "Instant Status Toggle": "Change publication status instantly from administrative tables without opening the full edit form.",
+  "Preview Mode": "Live frontend preview showing exactly how the published article will appear to visitors before going live.",
+  "Publication Timestamp": "Schedule custom publication dates and timestamps for upcoming articles.",
+  "Responsive Reading View": "Clean, distraction-free reading typography optimized for mobile phones, tablets, and desktops.",
+  "Social Share Buttons": "One-click social sharing to WhatsApp, Facebook, LinkedIn, Twitter, and Email.",
+  "Related Articles Widget": "Automatically suggests related articles based on category tags and author matching.",
+  "Search & Filter": "Article search bar and category filter allowing readers to explore past publications easily.",
+
+  // Module 11: Parent & Community Engagement
+  "Parent Testimonials": "Collect and display feedback from parents highlighting academic quality, safety, and institutional values.",
+  "Alumni Feedback": "Showcase quotes and reviews from past graduates reflecting on their educational foundation.",
+  "Star Rating & Reviews": "5-star rating widget displaying verified parent satisfaction ratings.",
+  "Approval Status": "Moderation queue allowing admins to review, edit, and approve submitted testimonials before publishing.",
+  "Chairman & Principal Messages": "Dedicated executive welcome addresses with executive photos, vision quotes, and signature graphics.",
+  "Founders Vision": "Historical founding principles and institutional legacy statement from the founding board.",
+  "Journey Timeline Cards": "Interactive timeline cards showcasing major institutional growth milestones year by year.",
+  "Section Manager": "Reorder and toggle executive message cards across various portal landing pages.",
+  "360° Virtual Campus Tour": "Interactive 360-degree panoramic virtual tour showcasing campus grounds, labs, and classrooms.",
+  "Building Information": "Detailed architectural specs, floor plans, and room allocations for all campus blocks.",
+  "Block Types & Rooms": "Information regarding Academic Block, Administrative Wing, Sports Complex, and Auditorium.",
+  "Interactive Site Map": "Clickable campus map helping prospective parents locate specific facilities and visitor entry points.",
+  "Inquiry Ingestion": "Automated capture of public contact inquiries submitted through website forms into a central admin inbox.",
+  "Status Tracking (New/Replied/Closed)": "Lead management workflow tracking inquiry progress from new submission to resolution.",
+  "Admin Email Alerts": "Instant email notifications dispatched to admission officers whenever a new inquiry is submitted.",
+  "Export to Excel": "One-click export of inquiry leads into CSV/Excel spreadsheets for marketing analytics.",
+
+  // Module 12: Interactive AI Chatbot Engine
+  "Intent & Keyword Builder": "Train the AI assistant on specific keyword triggers, student query intents, and institutional terminology.",
+  "Category Tagging": "Organize FAQ knowledge base items by domain (Admissions, Fees, Transport, Academics, Exam Dates).",
+  "Rich Text Answers": "Format bot responses with clickable links, bold key points, bulleted lists, and contact numbers.",
+  "Active Status Toggle": "Enable or disable specific FAQ knowledge base answers instantly based on active school policies.",
+  "Unanswered Queries Inbox": "Captures visitor questions that couldn't be answered by AI, allowing admins to resolve them and convert them into permanent FAQs with one click.",
+  "One-Click Convert to FAQ": "Instantly convert unanswered visitor queries into structured knowledge base items with one click.",
+  "Resolution Status Tracker": "Track unanswered query resolution status (Pending, Under Review, Converted to FAQ, Dismissed).",
+  "User Analytics": "Dashboard metrics showing most popular questions, chat volume trends, and AI resolution success rates.",
+  "Custom Assistant Name": "Customize the virtual chatbot name (e.g., 'NPS Assistant', 'WEBcore AI') and avatar branding.",
+  "Welcome Greeting Message": "Configure custom greeting prompts presented to visitors when opening the chat widget.",
+  "Primary Palette Config": "Match chatbot widget color scheme to institutional brand identity (Midnight, Royal, Cyber Neon).",
+  "API Key Management": "Secure configuration interface for LLM provider API credentials, token limits, and rate limits.",
+  "Floating Web Widget": "Non-intrusive floating chat bubble positioned at the bottom right of all website pages.",
+  "Instant AJAX Search": "Real-time instant search suggestions as visitors type their questions into the chat input.",
+  "Lead Capture Popup": "Prompt visitors to leave their name and phone number for follow-up if their question requires human staff help.",
+  "Mobile Touch Optimized": "Full-screen responsive chat drawer optimized for seamless mobile phone interaction.",
+
+  // Module 13: Popup & Inquiry Form Builder
+  "Modal Title & Content": "Configure campaign popup headline, promotional body text, countdown banners, and imagery.",
+  "Trigger Conditions (Delay/Scroll)": "Set popup trigger rules (e.g. show after 5 seconds delay, after 50% page scroll, or on exit intent).",
+  "Target URL Rules": "Display popups on specific pages (e.g., only on Admissions page or Homepage) or site-wide.",
+  "Active Toggle": "Enable or disable marketing popup campaigns instantly without deleting campaign assets.",
+  "Custom Form Fields": "Add text inputs, dropdown selects, checkboxes, radio buttons, and textareas to lead forms.",
+  "Required Field Flags": "Mark critical form fields as mandatory with client-side and server-side validation.",
+  "Input Type Selectors": "Enforce data formats (Email address, Phone number, Date picker, File attachment).",
+  "CTA Button Styling": "Customize submit button label text, background colors, and hover animation effects.",
+  "Dynamic Math CAPTCHA": "Prevents automated bot spam submissions on registration and inquiry forms with dynamic server-side session math verification.",
+  "Session Verification": "Server-side CSRF token and session state verification ensuring legitimate human form submission.",
+  "Spam Protection": "Automatic IP rate limiting blocking repeated rapid submissions from suspicious IP addresses.",
+  "IP Rate Limiting": "Restricts single IP addresses to a maximum number of form submissions per hour.",
+  "Lead Inbox": "Centralized administrative dashboard displaying all submitted popup leads with time stamps.",
+  "Submission CSV Export": "Export complete submission lead records to CSV spreadsheets for CRM import.",
+  "Deletion Controls": "Delete test submissions or obsolete inquiry records securely with audit logs.",
+  "Notification Routing": "Route lead notification emails automatically to specific staff department inboxes.",
+
+  // Module 14: Advanced SEO & Meta Suite
+  "Page Meta Titles": "Custom browser title tags tailored for each dynamic page, article, event, and facility highlight.",
+  "Meta Descriptions": "Compelling meta descriptions optimized for search engine result snippets and social previews.",
+  "Focus Keywords": "Assign primary and secondary focus keywords per page for SEO optimization tracking.",
+  "Open Graph & Twitter Cards": "Custom OG images, titles, and descriptions ensuring stunning visual previews when links are shared on social media.",
+  "Live sitemap.xml Generator": "Automated sitemap generator that dynamically indexes all public pages, events, blogs, and facility URLs.",
+  "Dynamic Route Indexer": "Automatically includes new CMS pages, events, and dynamic slugs in the sitemap without manual intervention.",
+  "Robots.txt Rules Config": "Edit robots.txt directive rules to control search engine crawler indexing behavior.",
+  "SEO Health Audit": "Automated diagnostic tool highlighting missing meta tags, broken internal links, and unoptimized images.",
+  "Sync All System Routes": "One-click tool to scan all application routes and generate missing meta records automatically.",
+  "Mass Edit Interface": "Spreadsheet-style table view allowing admins to edit meta titles and descriptions across dozens of pages rapidly.",
+  "Canonical URL Manager": "Configure canonical URL tags to prevent duplicate content penalties from search engines.",
+  "Structured Schema Data": "JSON-LD structured data generator for School, Event, Article, and Organization schema markup.",
+  "Google Analytics ID": "Easy input interface for Google Analytics 4 (GA4) measurement IDs.",
+  "Tag Manager Tracking": "Inject Google Tag Manager (GTM) container scripts seamlessly across head and body tags.",
+  "Search Console Verification": "Paste Google Search Console, Bing Webmaster, and Pinterest verification meta tags.",
+  "Header/Footer Script Injector": "Safely inject custom tracking pixels (Facebook Pixel, LinkedIn Insight, Custom JS) without touching code files.",
+
+  // Module 15: Theme & Styling Engine
+  "Modern Midnight": "Sleek dark mode theme preset with deep navy backgrounds and vibrant cyan/purple neon accents.",
+  "Classic Royal": "Elegant academic theme preset featuring rich navy blue, crisp white, and gold accents.",
+  "Emerald Academic": "Fresh educational theme preset incorporating deep emerald greens, warm ambers, and clean typography.",
+  "Cyber Neon": "High-tech futuristic theme preset with glowing neon highlights and glassmorphic card elements.",
+  "Custom Palette": "Build a completely custom institutional color scheme using hex color pickers.",
+  "Primary Color Picker": "Set the dominant brand color used across buttons, active navigation links, and progress bars.",
+  "Accent & Text Colors": "Fine-tune secondary accent colors, muted text shades, and background contrast.",
+  "Font Selector": "Choose from curated Google Fonts pairings (Outfit, Plus Jakarta Sans, Inter, Roboto, Playfair Display).",
+  "Border Radius Tweaker": "Adjust UI element roundedness (Sharp 0px, Modern 12px, Full Round 50px).",
+  "Top Bar Contact Info": "Configure top notification bar contact phone numbers, operating hours, and quick links.",
+  "Social Icon Links": "Add header and footer social media links (Facebook, Instagram, YouTube, LinkedIn, Twitter, WhatsApp).",
+  "Copyright Text": "Custom footer copyright notice text, developer credits, and annual year auto-update.",
+  "Logo Placement Controls": "Position school logo left, center, or inline with primary header navigation.",
+  "One-Click Restore Default": "Reset all theme customizations back to clean factory default settings instantly.",
+  "Export Theme Settings": "Download custom theme configuration files as JSON for backup or multi-branch deployment.",
+  "Import Custom Styling": "Upload theme JSON configurations to apply branding across secondary school websites.",
+  "Active Theme Switcher": "Toggle between saved seasonal or institutional theme presets with one click.",
+
+  // Module 16: Publishing Queue & Scheduler
+  "Pending Release Feed": "Live administrative dashboard displaying all content queued for future publication.",
+  "Model & ID Target": "Identifies target content type (Event, Announcement, Blog Article, Media Album) and item ID.",
+  "Target Release Timestamp": "Precise date and time scheduler specifying when content should go live automatically.",
+  "Queue Status Indicator": "Visual status badges (Scheduled, Publishing, Published, Cancelled, Failed).",
+  "Publish Now Immediate Override": "Force immediate publication of queued items ahead of schedule with one click.",
+  "Reschedule Release Date": "Change the target publication timestamp of any queued item easily.",
+  "Cancel Scheduled Task": "Remove an item from the publishing queue and revert it back to draft status.",
+  "Bulk Publish Action": "Select multiple queued items and publish them all simultaneously.",
+  "Laravel Artisan Scheduler": "Built-in task runner invoking `php artisan schedule:run` for precision background publishing.",
+  "Cron Execution Logs": "Detailed execution log trail documenting automated cron runs and task outcomes.",
+  "Failed Release Alerts": "Admin alert notifications dispatched if a scheduled task fails to execute.",
+  "Auto-Archive Old Items": "Automated background scheduler that archives expired notices and past events based on retention rules.",
+  "Publication Timeline": "Visual history timeline tracking all automated content releases across months.",
+  "Publisher Account Tag": "Audit record identifying which admin user scheduled each content item.",
+  "Release Action Log": "Historical record of all queue operations (Created, Rescheduled, Published, Overridden).",
+  "Historical Queue Archive": "Searchable archive of past publishing queue tasks for compliance audits.",
+
+  // Module 17: Visitor Geolocation & Analytics
+  "Real-time Visitor Pins": "Interactive Leaflet world map showcasing live visitor locations, active country heatmaps, and city-level traffic demographics.",
+  "City & Country Aggregation": "Automated geographic traffic clustering grouping visitors by country, state, and city.",
+  "IP Geolocation Lookup": "Instant IP address resolution identifying visitor ISP, city coordinates, and country code.",
+  "Interactive Map Zoom": "Full interactive map controls with smooth zoom, pan, and custom marker popups.",
+  "Top Viewed Pages": "Analytics table ranking the most visited website pages, articles, and facility showcases.",
+  "Session Duration": "Track average visitor engagement time per page and overall session length.",
+  "Bounce Rate Counter": "Measure the percentage of single-page visits to evaluate landing page effectiveness.",
+  "Daily/Monthly Traffic Charts": "Visual bar charts and line graphs showing visitor traffic trends over time.",
+  "IP Address": "Record visitor IP address with privacy anonymization settings for compliance.",
+  "User Agent & OS": "Track visitor device operating system (Windows, macOS, iOS, Android, Linux) and browser type.",
+  "Referrer URLs": "Identify traffic sources (Google Search, Direct, Facebook, WhatsApp, External Site Links).",
+  "Individual Session Timeline": "Detailed step-by-step click path illustrating a visitor's journey through the website.",
+  "CSV Visitor Logs Export": "Export granular page visit logs (IP address, OS, Browser, Session Duration, Referrer URLs) for audit and compliance reports.",
+  "Log Retention Policy": "Configure automated log purging rules (e.g. retain logs for 30, 60, or 90 days).",
+  "Manual Purge Tool": "One-click administration tool to clear historical visit logs securely.",
+  "Privacy Anonymization": "Mask last octets of visitor IP addresses to comply with global privacy regulations.",
+
+  // Module 18: Website Performance & Health
+  "Page Load Speed (ms)": "Real-time server execution timer measuring total response generation time in milliseconds.",
+  "Database Query Count": "Monitor total SQL queries executed per page request to catch N+1 query bottlenecks.",
+  "Memory Usage Metric": "Track PHP memory allocation per request to ensure optimal server RAM consumption.",
+  "HTTP Cache Hit Rate": "Percentage of static assets served directly from browser or CDN cache.",
+  "WebP Auto Conversion": "Automatic server-side image processing converting uploaded images into lightweight WebP format.",
+  "Lossless Compression": "Compress image file sizes up to 80% without any visible loss in visual quality.",
+  "Lazy Loading Engine": "Defer loading off-screen images until visitors scroll near them, accelerating initial page loads.",
+  "CDN Asset Mirroring": "Serve heavy media files, CSS, and JS libraries from fast edge CDN nodes.",
+  "Clear Route Cache": "One-click button to purge Laravel compiled route cache after adding new routes.",
+  "Clear View Cache": "Flush compiled Blade view templates to ensure immediate visual updates.",
+  "Config Purge": "Clear cached application configuration settings instantly.",
+  "OPcache Status": "Monitor PHP OPcache memory usage, script cache hit ratios, and precompiled script status.",
+  "Google PageSpeed API Key": "Integration field for automated Google PageSpeed Insights API performance audits.",
+  "Asset Minification Toggle": "Enable automatic minification of inline CSS and JavaScript code.",
+  "Gzip/Brotli Compression": "Verify server HTTP response compression headers for maximum transfer speed.",
+  "Performance Logs": "Historical performance log recording server speed benchmarks and optimization triggers.",
+
+  // Module 19: Security, RBAC & Audit Logs
+  "Admin User Creation": "Create new administrative user accounts with custom credentials, email verification, and profile photos.",
+  "Work Groups & Roles": "Assign granular user roles (Super Admin, Principal, Web Editor, Admission Officer, Event Manager).",
+  "Permission Matrices": "Fine-grained permission checklist controlling read, write, edit, and delete access per module.",
+  "Account Lockout Control": "Automatically lock accounts after repeated failed login attempts to prevent brute-force attacks.",
+  "Session Timeout Protection": "Automatically log out inactive administrative sessions after a configurable inactivity threshold.",
+  "No-Cache Response Headers": "Inject HTTP headers preventing browser back-button caching of sensitive admin pages.",
+  "CSRF Tokens": "Enforce Cross-Site Request Forgery token validation on all form submissions and AJAX requests.",
+  "XSS Sanitation": "Automatic input sanitization stripping malicious script tags from all user-submitted fields.",
+  "Comprehensive Login Log": "Audit log recording every admin login event (Username, IP address, Timestamp, Success/Failure).",
+  "IP Address Tracking": "Geolocate login attempts to identify unauthorized access attempts from unexpected locations.",
+  "Export Audit Trail": "Export full security and login logs to CSV spreadsheets for security compliance reviews.",
+  "Automated Log Purge": "Automatically purge login audit logs older than a specified retention period.",
+  "Password Security Policies": "Enforce strong password complexity rules (Minimum length, numbers, special characters, uppercase).",
+  "Forgot Password Broker": "Secure password reset email workflow with encrypted time-limited reset tokens.",
+  "Two-Factor Auth Support": "Optional 2FA TOTP authenticator app support for super administrator logins.",
+  "Active Session List": "View and terminate active logged-in sessions across devices remotely.",
+
+  // Module 20: Recycle Bin & Data Recovery
+  "Deleted Items Feed": "Centralized trash repository displaying all soft-deleted records across the platform.",
+  "Model Type Filter": "Filter trash items by entity type (Events, Categories, Blog Articles, Announcements, Photo Albums).",
+  "Deleter User Information": "Displays the username and role of the admin who soft-deleted each record.",
+  "Deletion Timestamp": "Exact date and time when the record was moved to the recycle bin.",
+  "Instant Restoration to Live Site": "One-click restoration returning soft-deleted items back to active live status immediately.",
+  "Relationship Intact Recovery": "Restores deleted items along with all linked foreign relationships (e.g. photos inside restored events).",
+  "Conflict Resolution": "Automatically handles slug or title conflicts if a new item with the same name was created while in trash.",
+  "Batch Restore": "Select multiple trash records and restore them simultaneously with a single action.",
+  "Individual Permanent Delete": "Irrevocably purge a single trash item from the database and delete associated physical files.",
+  "Bulk Empty Trash": "Empty the entire recycle bin with double-confirmation safeguards.",
+  "Confirmation Safeguards": "Require admin password re-verification before executing permanent purges.",
+  "Storage Cleanup": "Automatically delete linked images, PDF files, and thumbnail assets from disk when permanently purged.",
+  "Event Category Trash": "Dedicated trash view for soft-deleted event categories and sub-categories.",
+  "Sub-category Recovery": "Restore parent categories and child sub-categories together seamlessly.",
+  "Orphaned Items Alert": "Alert notification if restoring an item whose parent category has been permanently deleted.",
+  "Recycle Audit Records": "Detailed log recording every deletion, restoration, and permanent purge event.",
+
+  // Module 21: Automated Cloud Backup & S3 Metrics
+  "Total S3 Bytes Used": "Real-time cloud storage meter displaying total gigabytes used on AWS S3 / DigitalOcean Spaces.",
+  "Object Count Statistics": "Count total uploaded files, images, PDFs, and thumbnails stored in cloud storage.",
+  "Bandwidth Monitoring": "Monitor monthly cloud data transfer bandwidth and CDN asset delivery.",
+  "Storage Cost Insights": "Estimate monthly cloud storage cost metrics based on usage trends.",
+  "Database SQL Exporter": "One-click complete database dump and assets ZIP package generator for automated nightly backups and disaster recovery.",
+  "Media Files Zip Generation": "Compress public uploads directory into a downloadable ZIP archive.",
+  "Secure Backup Download": "Encrypted, authenticated download links for administrative backup packages.",
+  "Automated Nightly Dumps": "Scheduled cron background job creating automatic daily database backups.",
+  "DigitalOcean Spaces / AWS S3 Mirroring": "Dual cloud storage sync uploading media files to secondary cloud buckets for redundancy.",
+  "Sync Status Counter": "Track sync progress and verify that all local files match cloud storage objects.",
+  "Missing File Recovery": "Automatically re-upload local files missing from cloud storage during sync audits.",
+  "Direct Bucket Download": "Direct access links to inspect cloud storage bucket contents.",
+  "One-Click Restore Tool": "Database restoration utility to import database SQL backups during emergency recovery.",
+  "Database Schema Check": "Diagnostic tool verifying table structure, foreign keys, and index integrity post-restore.",
+  "File Integrity Inspector": "Verify file hash checksums to ensure restored media files are uncorrupted.",
+  "System Backup Logs": "Complete history log of all automated and manual backup operations.",
+
+  // Module 22: User Manual & Admin Feedback
+  "Module-Wise Admin Guides": "Step-by-step documentation articles explaining how to operate each of the 26 platform modules.",
+  "Step-by-Step Screenshots": "Annotations and visual screenshots guiding admin users through complex workflows.",
+  "Quick Reference Cards": "Concise cheat-sheet cards summarizing key admin tasks and keyboard shortcuts.",
+  "Workflow Diagrams": "Visual process flowcharts illustrating content approval, publishing, and backup workflows.",
+  "Create / Edit Guides": "Built-in editor allowing lead administrators to write custom documentation for staff.",
+  "Markdown Support": "Format documentation guides quickly using clean Markdown syntax.",
+  "Rich Media Embeds": "Embed tutorial videos and slideshows directly into administrative user guides.",
+  "Version Control": "Track guide edits and maintain revision history for documentation updates.",
+  "Admin User Feedback Form": "Embedded feedback form allowing admin users to submit suggestions or report issues.",
+  "Helpful / Unhelpful Ratings": "Thumbs up / thumbs down voting buttons on user guides to evaluate documentation quality.",
+  "Ticket Status Workflow (Pending/Resolved)": "Manage submitted feedback tickets through a resolution lifecycle.",
+  "Resolution Remarks": "Add developer notes and resolution remarks when closing feedback tickets.",
+  "Documentation Indexing": "Automated search indexer building a searchable index of all guide titles and contents.",
+  "Instant Text Search": "Fast live search bar filtering guides in real-time as users type.",
+  "One-Click Feed Refresh": "Refresh documentation feeds to pull newly published admin guides instantly.",
+  "Export PDF Guides": "Export complete admin user manual guides as formatted PDF documents for offline training.",
+
+  // Module 23: Social Media Feed Integration
+  "Fetch Social Posts": "Automated background job fetching latest posts from official institutional social media channels.",
+  "Instagram API Connector": "Direct Graph API integration fetching Instagram photos, carousels, reels, and captions.",
+  "YouTube Video Fetcher": "YouTube Data API v3 connector pulling latest uploaded campus videos and channel stats.",
+  "Custom URL Store": "Store custom social post permalinks for manual highlighting on website feeds.",
+  "Pending Approval Queue": "Moderation queue where fetched social posts await admin approval before frontend display.",
+  "One-Click Approve / Reject": "Quickly approve appropriate posts or reject off-topic content from showing on the website.",
+  "Post Preview Grid": "Visual grid previewing how social feeds will render on the public website layout.",
+  "Filtered Out Content": "Archive of rejected social posts kept for moderation audit history.",
+  "Responsive Social Grid": "Modern masonry or grid widget embedding live social posts on the website homepage.",
+  "Direct Link to Post": "Clickable post cards opening original posts on Instagram, YouTube, or Facebook in a new tab.",
+  "Embedded Video Player": "Play YouTube videos directly within the website social widget lightbox.",
+  "Like/Share Counter": "Display social engagement counts (Likes, Comments, Views) on post cards.",
+  "Auto-Sync Interval": "Set automated fetch frequency (e.g. sync social feeds every 1 hour, 6 hours, or daily).",
+  "Channel Access Tokens": "Secure administrative interface to update expired Instagram and Facebook access tokens.",
+  "Max Posts Displayed": "Configure maximum number of social posts rendered in the frontend widget.",
+  "Cache TTL Rules": "Set cache time-to-live settings to minimize external API requests and prevent rate limiting.",
+
+  // Module 24: Circular & Document Repository
+  "Upload PDF / Office Documents": "Document uploader supporting PDF, Word, Excel, and PowerPoint file formats.",
+  "Circular Title & Category": "Categorize notices (Academic Circulars, Examination Schedules, Holiday Lists, Transport Notices).",
+  "Academic Year Tag": "Tag documents by academic year for organized archive management.",
+  "Target Audience Filter": "Specify recipient visibility (Parents, Students, Staff, General Public).",
+  "Visual Document Sequence": "Drag-and-drop ordering interface to arrange document listing order visually.",
+  "Pin Important Notices": "Pin urgent circulars to the top of the download list with a highlighted badge.",
+  "Active / Inactive Status": "Toggle document download availability on or off instantly.",
+  "File Size Display": "Displays file format icon (PDF/DOC) and exact file size in MB for download transparency.",
+  "Public Download Center": "Dedicated public frontend page presenting downloadable circulars with search and filters.",
+  "Category Tabs": "Filter downloadable documents by category tabs (Academic, Administrative, Events, Fee Notices).",
+  "Fast Direct Links": "Direct high-speed download links powered by cloud storage CDN mirroring.",
+  "Mobile Viewport PDF Viewer": "Embedded responsive PDF reader allowing parents to read circulars directly on mobile phones.",
+  "Restricted Document Links": "Generate secure, signed download URLs for sensitive internal documents.",
+  "Auto-Archive Expired Notices": "Automatically move outdated circulars to historical archives after a set expiry date.",
+  "Download Counter": "Track total download counts per document to gauge parent response and engagement.",
+  "Version History": "Upload updated revisions of documents while preserving past version records.",
+
+  // Module 25: Academic & Curriculum Delivery
+  "Montessori & Early Years": "Showcase play-based learning methodologies, sensory activities, and early childhood foundation curricula.",
+  "Kindergarten Curriculum": "Outline LKG & UKG foundational literacy, numeracy, social skills, and creative art programs.",
+  "Primary School (Grades 1-5)": "Comprehensive core subject breakdown (Mathematics, Environmental Science, Languages, Computer Studies).",
+  "Middle & Senior School": "Advanced academic streams (Physics, Chemistry, Biology, Mathematics, Computer Science, Commerce, Humanities).",
+  "i5 Academy Excellence": "Highlight specialized institutional competitive exam coaching (JEE, NEET, Olympiads, NTSE).",
+  "Co-Scholastic Syllabi": "Detail physical education, music, dance, visual arts, drama, and value education curricula.",
+  "STEM & Robotics Workshops": "Showcase hands-on robotics labs, coding clubs, maker spaces, and science project fairs.",
+  "Language Academics": "English literature, vernacular languages, and foreign language elective offerings (French, German, Sanskrit).",
+  "Multidisciplinary Pedagogy": "Curriculum alignment with National Education Policy (NEP 2020) experiential learning frameworks.",
+  "Skill Development Tracks": "Vocational skill modules, financial literacy workshops, and digital citizenship programs.",
+  "Assessment Guidelines": "Continuous and Comprehensive Evaluation (CCE) policies, grading rubrics, and exam schedules.",
+  "Compliance Documentation": "Official government and board compliance certificates for academic standards.",
+  "Syllabus Breakdown PDFs": "Downloadable term-wise syllabus breakdown booklets per grade level.",
+  "Subject Recommendations": "Curated textbook lists, reference book recommendations, and digital learning tools.",
+  "Teacher Directories": "Faculty department lists featuring teacher qualifications, experience, and achievements.",
+  "Academic Calendar Link": "Direct link to interactive annual academic calendar detailing term dates, exams, and holidays.",
+
+  // Module 26: Campus Facilities & Infrastructure
+  "Science & Computer Labs": "Showcase state-of-the-art Physics, Chemistry, Biology, and high-speed Computer Science laboratories.",
+  "Digital Smart Classrooms": "Highlight interactive smart boards, audio-visual projection systems, and ergonomic classroom furniture.",
+  "Library & Reading Rooms": "Introduce extensive print library collections, digital e-book archives, and quiet study reading halls.",
+  "Sports Complex & Grounds": "Detailed showcase of synthetic athletic tracks, football grounds, basketball courts, and indoor sports arenas.",
+  "Facility Title & Description": "Edit facility titles, detailed equipment specifications, and capacity highlights.",
+  "Icon Selection": "Choose from a curated set of vector facility icons for visual navigation cards.",
+  "High-Res Gallery Upload": "Upload multi-photo image galleries showcasing facility rooms, equipment, and student activities.",
+  "Display Sequence": "Set display order for facilities on the main campus showcase page.",
+  "Route Numbers & Maps": "Detailed bus route directory listing bus route numbers, coverage areas, and interactive Google Maps.",
+  "Bus Stops & Timings": "Schedule tables showing morning pickup and afternoon drop-off times per bus stop location.",
+  "Safety Features": "Highlight transport safety measures (GPS tracking, CCTV cameras, speed governors, female bus attendants).",
+  "Transport Manager Contact": "Direct phone numbers and email contacts for transport helpdesk assistance.",
+  "Block Types & Floor Plans": "Architectural floor plans and block layouts (Academic Block, Science Block, Primary Wing, Auditorium).",
+  "Classroom Allocations": "Room number directories and department location guides across campus floors.",
+  "Administrative Wings": "Location guidance for Principal's Office, Admissions Office, Accounts Department, and Visitor Lounge.",
+  "Safety & Security Specs": "24/7 CCTV surveillance specs, fire safety systems, security guard posts, and campus access control protocols.",
+
+  // Module 27: Enterprise Architecture & Cloud Infrastructure
+  "MySQL InnoDB Engine": "High-performance relational database engine ensuring ACID compliance and relational data integrity.",
+  "Query Optimization": "Optimized SQL query execution plans with indexing to ensure sub-millisecond response times.",
+  "Transaction Isolation": "Prevents data race conditions during concurrent admin updates.",
+  "Multi-Table Schemas": "Clean normalized database architecture handling complex school relationships.",
+  "RESTful API Endpoints": "Secure RESTful API interfaces powering mobile integrations and frontend dynamic widgets.",
+  "JSON Data Transformers": "High-speed JSON serialization layer converting database records into API payloads.",
+  "Webhook Event Triggers": "Real-time webhooks dispatching events to external notification channels.",
+  "CORS Policy Security": "Strict Cross-Origin Resource Sharing rules protecting internal APIs.",
+  "DigitalOcean Spaces CDN": "Edge-accelerated media delivery serving website photos and assets lightning fast.",
+  "AWS S3 Assets Engine": "High-durability cloud object storage backing up institutional media repositories.",
+  "TLS/SSL 256-bit Encryption": "End-to-end SSL encryption protecting all web traffic and user data in transit.",
+  "HTTP/2 Acceleration": "Multiplexed HTTP/2 protocol support for parallel asset downloading.",
+  "Nightly Auto Backups": "Automated background cron job backing up database SQL dumps and media archives every night.",
+  "Point-in-Time Restores": "Rapid system recovery utility restoring application state to any historical backup point.",
+  "Integrity Checksums": "Hash integrity checks verifying that restored database backups match original source hashes.",
+  "System Status Logs": "Comprehensive operational logging tracking server uptime, memory health, and API response metrics."
+};
+
+function openFeatureModal(funcName, subName, modName) {
+  document.getElementById('modalTitle').textContent = funcName;
+  document.getElementById('modalTag').textContent = `${modName} • ${subName}`;
+  
+  let desc = FEATURE_DESCRIPTIONS[funcName];
+  if (!desc) {
+    desc = `Provides comprehensive operational management and real-time interface capabilities for ${funcName} within ${subName}. Administrators can customize parameters, configure workflows, update database records, and manage publish states securely. Delivers a seamless, high-performance experience for website visitors, parents, and institutional stakeholders across desktop and mobile browsers.`;
+  }
+    
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('metaRole').textContent = modName.includes("SECURITY") ? "System Security Admin" : modName.includes("ADMISSION") ? "Admissions Officer / Web Editor" : "Super Admin / Web Controller";
+  document.getElementById('metaRoute').textContent = `/admin/${modName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+  document.getElementById('featureModal').classList.add('active');
+}
+
+function closeFeatureModal() {
+  document.getElementById('featureModal').classList.remove('active');
+}
+
+// Global search engine for all features
+const allFeaturesIndex = [];
+modules.forEach((m, mIdx) => {
+  m.submodules.forEach(sub => {
+    sub.funcs.forEach(f => {
+      allFeaturesIndex.push({
+        feature: f,
+        submodule: sub.name,
+        module: m.name,
+        slideIndex: mIdx + 2
+      });
+    });
+  });
+});
+
+const searchModal = document.getElementById('searchModal');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+function openSearch() {
+  searchModal.classList.add('active');
+  searchInput.focus();
+  renderSearchResults('');
+}
+
+function closeSearch() {
+  searchModal.classList.remove('active');
+  searchInput.value = '';
+}
+
+function renderSearchResults(query) {
+  const q = query.toLowerCase().trim();
+  searchResults.innerHTML = '';
+
+  const filtered = allFeaturesIndex.filter(item =>
+    item.feature.toLowerCase().includes(q) ||
+    item.submodule.toLowerCase().includes(q) ||
+    item.module.toLowerCase().includes(q)
+  );
+
+  if (filtered.length === 0) {
+    searchResults.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,.5);padding:2rem">No features found matching "${query}"</div>`;
+    return;
+  }
+
+  filtered.slice(0, 35).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'search-item';
+    div.innerHTML = `
+      <div class="search-item-title">${item.feature}</div>
+      <div class="search-item-sub">${item.module} &bull; ${item.submodule}</div>`;
+    div.onclick = () => {
+      closeSearch();
+      goToSlide(item.slideIndex);
+    };
+    searchResults.appendChild(div);
+  });
+}
+
+searchInput.addEventListener('input', (e) => renderSearchResults(e.target.value));
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  KEYBOARD & TOUCH EVENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeFeatureModal();
+    closeSearch();
+    return;
+  }
+  if (searchModal.classList.contains('active')) return;
+
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') goToSlide(current + 1, 1);
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') goToSlide(current - 1, -1);
+  if (e.key === 'Home') goToSlide(0, -1);
+  if (e.key === 'End') goToSlide(total - 1, 1);
+  if (e.key === ' ') { e.preventDefault(); toggleAutoplay(); }
+  if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+  if (e.key === 's' || e.key === 'S') {
+    e.preventDefault();
+    openSearch();
+  }
+});
+
+// Touch swipe support for mobile Devices
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', (e) => {
+  const touchEndX = e.changedTouches[0].screenX;
+  if (touchStartX - touchEndX > 50) goToSlide(current + 1, 1);
+  if (touchEndX - touchStartX > 50) goToSlide(current - 1, -1);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildBg();
+  slides = buildSlides();
+  total = slides.length;
+  buildDots(total);
+  updateControls();
+  startTimer();
+
+  document.getElementById('prevBtn').onclick = () => goToSlide(current - 1, -1);
+  document.getElementById('nextBtn').onclick = () => goToSlide(current + 1, 1);
+  document.getElementById('autoplayBtn').onclick = toggleAutoplay;
+  document.getElementById('searchTriggerBtn').onclick = openSearch;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RELcore CRM — Enterprise Business & CRM Platform Presentation</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --midnight: #0A0E27;
+            --royal: #1E3A8A;
+            --electric: #3B82F6;
+            --cyan: #06B6D4;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --rose: #F43F5E;
+            --purple: #8B5CF6;
+            --neon: #00F0FF;
+            --gold: #FBBF24;
+            --white: #FFFFFF;
+            --plat: #F8FAFC;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--midnight);
+            color: var(--white);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* BACKGROUND & PARTICLES */
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0A0E27 0%, #060B1E 50%, #0F1729 100%);
+        }
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(95px);
+            opacity: 0.12;
+            animation: drift 30s infinite ease-in-out;
+        }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(120px, -90px) scale(1.2); }
+            66% { transform: translate(-80px, 70px) scale(0.85); }
+        }
+        .stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: #ffffff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.4); }
+        }
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* SLIDES CONTAINER */
+        #slides-container {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(1.2rem, 3vh, 3rem) clamp(1.5rem, 4vw, 4rem);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0) !important;
+        }
+
+        /* PROGRESS & CONTROLS */
+        .progress-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon), var(--electric), var(--purple), var(--gold));
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--neon);
+        }
+        .controls {
+            position: fixed;
+            bottom: clamp(0.8rem, 2vh, 1.8rem);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 0.5rem 1.6rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            opacity: 0.8;
+        }
+        .ctrl-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+        .slide-counter {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            min-width: 5.5rem;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+        .timer {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Outfit', monospace;
+        }
+        .autoplay-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            cursor: pointer;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .autoplay-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .autoplay-btn.active {
+            background: linear-gradient(135deg, var(--electric), var(--purple));
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .nav-dots {
+            position: fixed;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot.active {
+            background: var(--neon);
+            width: 6px;
+            height: 20px;
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--neon);
+        }
+        .dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        /* TITLE SLIDE LOGO & GLOW */
+        .title-slide {
+            text-align: center;
+            max-width: 1100px;
+            width: 100%;
+        }
+        .logo-ring-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-outer-ring {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, var(--neon), var(--purple), var(--electric)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            animation: spinRing 5s linear infinite;
+            opacity: 0.85;
+        }
+        .logo-inner-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, var(--gold), var(--amber), var(--neon)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            animation: spinRing 7s linear infinite reverse;
+            opacity: 0.65;
+        }
+        @keyframes spinRing { to { transform: rotate(360deg); } }
+        .logo-circle {
+            width: 155px;
+            height: 155px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), 0 0 100px rgba(139, 92, 246, 0.4);
+            animation: logoPulse 3s ease-in-out infinite;
+            padding: 18px;
+            overflow: hidden;
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 45px rgba(59, 130, 246, 0.5), 0 0 85px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 75px rgba(0, 240, 255, 0.8), 0 0 130px rgba(139, 92, 246, 0.6); }
+        }
+        .relcore-logo-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(1.03); }
+        }
+        .title-slide .tagline {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.4rem, 3.2vw, 2.5rem);
+            color: var(--gold);
+            font-weight: 800;
+            margin: 0.6rem 0 0.3rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .title-slide .subtitle {
+            font-size: clamp(1rem, 1.8vw, 1.4rem);
+            color: var(--cyan);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+        }
+        .title-divider {
+            width: 240px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon), transparent);
+            margin: 1.2rem auto;
+        }
+        .title-slide .stats-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(1.5rem, 4vw, 3.5rem);
+            margin-top: 2rem;
+        }
+        .title-stat { text-align: center; }
+        .title-stat .num {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2rem, 3.8vw, 3.2rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon), var(--electric));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        .title-stat .lbl {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.65);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.4rem;
+            font-weight: 600;
+        }
+        .stat-sep {
+            width: 1px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .pill-badge {
+            padding: 0.4rem 1.1rem;
+            border-radius: 50px;
+            border: 1px solid var(--pc, var(--electric));
+            color: var(--pc, var(--electric));
+            font-size: clamp(0.72rem, 1.1vw, 0.85rem);
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+        .pill-badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px var(--pc, var(--electric));
+        }
+
+        /* OVERVIEW SLIDE */
+        .overview-slide { width: 100%; max-width: 1300px; text-align: center; }
+        .slide-header { text-align: center; margin-bottom: 1.5rem; }
+        .slide-header .eyebrow {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            color: var(--neon);
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .slide-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.85rem;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            max-height: calc(100vh - 240px);
+            overflow-y: auto;
+            padding: 0.5rem 0.2rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+        .mod-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 0.75rem 0.9rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .mod-chip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--chip-color, var(--electric)), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .mod-chip:hover {
+            transform: translateY(-4px);
+            border-color: var(--chip-color, var(--electric));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--chip-color, var(--electric));
+        }
+        .mod-chip:hover::before { opacity: 0.2; }
+        .mod-chip .chip-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mod-chip .chip-name { font-size: 0.78rem; font-weight: 700; color: rgba(255, 255, 255, 0.95); line-height: 1.25; }
+
+        /* MODULE SLIDE DETAILS */
+        .module-slide { width: 100%; max-width: 1300px; position: relative; }
+        .mod-glow {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            right: -100px;
+            top: -100px;
+            pointer-events: none;
+        }
+        .mod-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .mod-icon-wrap {
+            width: 75px;
+            height: 75px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 25px var(--mod-color, rgba(59, 130, 246, 0.4));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .mod-number {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 800;
+            margin-bottom: 0.2rem;
+        }
+        .mod-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.7rem, 3.4vw, 2.7rem);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+        .mod-tagline {
+            font-size: clamp(0.88rem, 1.4vw, 1.15rem);
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+        .mod-description {
+            font-size: clamp(0.84rem, 1.2vw, 0.98rem);
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.035);
+            border-left: 4px solid;
+            border-radius: 0 10px 10px 0;
+            backdrop-filter: blur(10px);
+        }
+        .submodules-grid {
+            display: grid;
+            gap: 0.9rem;
+            max-height: calc(100vh - 290px);
+            overflow-y: auto;
+            padding-right: 0.4rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+        .submodules-grid.grid-1 { grid-template-columns: 1fr; }
+        .submodules-grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .submodules-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+        
+        .submodule-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 14px;
+            padding: 0.9rem 1.1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .submodule-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .sub-name {
+            font-weight: 800;
+            font-size: 0.92rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+        }
+        .funcs-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        .func-tag {
+            font-size: 0.73rem;
+            padding: 0.28rem 0.7rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+            transition: all 0.25s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .func-tag:hover {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            border-color: var(--neon);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* CLOSER SLIDE */
+        .closer-slide { text-align: center; max-width: 1100px; width: 100%; }
+        .closer-slide h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--white), var(--neon), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.8rem;
+            line-height: 1.1;
+        }
+        .closer-slide .sub {
+            font-size: clamp(1.05rem, 2vw, 1.45rem);
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .closer-modules-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            justify-content: center;
+            max-width: 1000px;
+            margin: 1.2rem auto;
+        }
+        .closer-chip {
+            font-size: 0.73rem;
+            padding: 0.32rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.04);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+        .closer-chip:hover {
+            transform: translateY(-2px) scale(1.06);
+            background: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 0 12px currentColor;
+        }
+        .cta-wrap {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 1.8rem;
+        }
+        .cta-btn {
+            padding: 0.85rem 2.2rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .cta-primary {
+            background: linear-gradient(135deg, var(--electric), var(--cyan));
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.45);
+        }
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.65);
+        }
+        .cta-admin {
+            background: linear-gradient(135deg, var(--purple), var(--rose));
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.45);
+        }
+        .cta-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.65);
+        }
+        .cta-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* INTERACTIVE MODAL POPUP DIALOG */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(6, 11, 30, 0.85);
+            backdrop-filter: blur(25px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96));
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 45px var(--modal-color, rgba(59, 130, 246, 0.4));
+            transform: scale(0.88) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+        .modal-overlay.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.4rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover {
+            background: rgba(244, 63, 94, 0.85);
+            transform: rotate(90deg);
+        }
+        .modal-badge {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--modal-color, var(--electric));
+            color: var(--modal-color, var(--electric));
+        }
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .modal-subtitle {
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 1.4rem;
+            font-weight: 500;
+        }
+        .modal-section {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1rem;
+        }
+        .modal-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--modal-color, var(--neon));
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .modal-list li {
+            font-size: 0.86rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.65;
+            margin-bottom: 0.4rem;
+            position: relative;
+            padding-left: 1.3rem;
+        }
+        .modal-list li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: var(--modal-color, var(--neon));
+            font-size: 0.8rem;
+        }
+        .modal-ui-preview {
+            background: #080e22;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-top: 0.8rem;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* FUTURISTIC SVG STYLING */
+        .futuristic-icon {
+            display: inline-block;
+            vertical-align: middle;
+            filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.4));
+            transition: transform 0.3s ease;
+        }
+        .mod-chip:hover .futuristic-icon {
+            transform: scale(1.18) rotate(5deg);
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+        .submodule-card:hover .futuristic-icon {
+            transform: scale(1.12);
+        }
+
+        /* ═════════════════════════════════════════════════════════════════
+           RESPONSIVE DESIGN SUITE (TABLETS & MOBILE PHONES)
+           ═════════════════════════════════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            .slide { padding: clamp(1rem, 2.5vh, 2.5rem) clamp(1rem, 3vw, 2.5rem); }
+            .modules-grid { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+            .submodules-grid.grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .mod-title { font-size: 2.1rem; }
+            .modal-card { max-width: 88vw; padding: 1.6rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-dots { display: none; }
+            .slide { padding: 4.2rem 1rem 4.8rem 1rem; justify-content: flex-start; overflow-y: auto; }
+            
+            /* TITLE COVER SLIDE */
+            .logo-ring-wrap { width: 130px; height: 130px; margin-bottom: 1rem; }
+            .logo-circle { width: 118px; height: 118px; padding: 12px; }
+            .title-slide .tagline { font-size: 1.4rem; }
+            .title-slide .subtitle { font-size: 0.9rem; }
+            .title-divider { width: 160px; margin: 0.8rem auto; }
+            .title-slide .stats-row { flex-wrap: wrap; gap: 0.8rem 1.4rem; margin-top: 1.2rem; }
+            .stat-sep { display: none; }
+            .title-stat .num { font-size: 1.8rem; }
+            .title-stat .lbl { font-size: 0.7rem; }
+            .pill-badge { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+
+            /* MODULE SLIDES */
+            .mod-header { gap: 1rem; margin-bottom: 0.8rem; }
+            .mod-icon-wrap { width: 56px; height: 56px; border-radius: 14px; }
+            .mod-number { font-size: 0.7rem; letter-spacing: 0.15em; }
+            .mod-title { font-size: 1.45rem; }
+            .mod-tagline { font-size: 0.82rem; }
+            .mod-description { font-size: 0.8rem; padding: 0.6rem 0.8rem; margin-bottom: 0.8rem; line-height: 1.5; }
+
+            /* GRIDS */
+            .modules-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; max-height: calc(100vh - 210px); }
+            .mod-chip { padding: 0.6rem 0.5rem; }
+            .mod-chip .chip-icon { width: 34px; height: 34px; font-size: 1.2rem; margin-bottom: 0.25rem; }
+            .mod-chip .chip-name { font-size: 0.72rem; }
+            
+            .submodules-grid { grid-template-columns: 1fr !important; gap: 0.65rem; max-height: calc(100vh - 270px); }
+            .submodule-card { padding: 0.75rem 0.85rem; }
+            .sub-name { font-size: 0.85rem; margin-bottom: 0.4rem; }
+            .func-tag { font-size: 0.68rem; padding: 0.22rem 0.55rem; }
+
+            /* CLOSER SLIDE */
+            .closer-slide h2 { font-size: 1.75rem; }
+            .closer-slide .sub { font-size: 0.95rem; margin-bottom: 1rem; }
+            .closer-chip { font-size: 0.68rem; padding: 0.25rem 0.6rem; }
+            .cta-wrap { flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; width: 100%; }
+            .cta-btn { width: 100%; justify-content: center; padding: 0.75rem 1.2rem; font-size: 0.88rem; }
+
+            /* CONTROLS BAR */
+            .controls {
+                bottom: 0.6rem;
+                width: calc(100% - 1.5rem);
+                max-width: 480px;
+                padding: 0.35rem 0.9rem;
+                gap: 0.5rem;
+                justify-content: space-between;
+            }
+            .ctrl-btn { padding: 0.3rem 0.5rem; font-size: 0.95rem; }
+            .slide-counter { font-size: 0.76rem; min-width: 4rem; }
+            .timer { display: none; }
+            .autoplay-btn { padding: 0.3rem 0.75rem; font-size: 0.74rem; }
+
+            /* MODAL DIALOG */
+            .modal-overlay { padding: 0.8rem; }
+            .modal-card { padding: 1.2rem; border-radius: 18px; max-height: 92vh; }
+            .modal-title { font-size: 1.25rem; }
+            .modal-subtitle { font-size: 0.82rem; margin-bottom: 1rem; }
+            .modal-close { top: 0.8rem; right: 0.8rem; width: 32px; height: 32px; font-size: 1.2rem; }
+            .modal-section { padding: 0.85rem 1rem; margin-bottom: 0.8rem; }
+            .modal-list li { font-size: 0.8rem; line-height: 1.5; }
+            .modal-ui-preview { font-size: 0.75rem; padding: 0.7rem 0.85rem; flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            .modules-grid { grid-template-columns: 1fr; }
+            .title-slide .stats-row { gap: 0.6rem 1rem; }
+            .title-stat .num { font-size: 1.5rem; }
+            .mod-title { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+<div class="animated-bg" id="animBg"></div>
+<div class="stars" id="starsBg"></div>
+
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+<div id="slides-container"></div>
+<div class="nav-dots" id="navDots"></div>
+
+<div class="controls">
+    <button class="ctrl-btn" id="prevBtn" title="Previous Slide (←)">&#8592;</button>
+    <span class="slide-counter" id="slideCounter">1 / 24</span>
+    <button class="ctrl-btn" id="nextBtn" title="Next Slide (→)">&#8594;</button>
+    <button class="autoplay-btn" id="autoplayBtn">&#9654; Auto</button>
+    <span class="timer" id="timer">00:00</span>
+</div>
+
+<!-- INTERACTIVE FEATURE POPUP MODAL DIALOG -->
+<div class="modal-overlay" id="featureModal" onclick="closeFeatureModal(event)">
+  <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeFeatureModal()">&times;</button>
+    <div class="modal-badge" id="modalModBadge">FEATURE DETAILS</div>
+    <h3 class="modal-title" id="modalTitle">Feature Deep Dive</h3>
+    <div class="modal-subtitle" id="modalSubTitle">RELcore CRM Capability Overview</div>
+    <div id="modalBody"></div>
+    <div style="margin-top: 1.5rem; text-align: right;">
+      <button class="cta-btn cta-primary" onclick="closeFeatureModal()" style="padding: 0.6rem 1.6rem; font-size: 0.85rem;">Close Card (Esc)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═════════════════════════════════════════════════════════════════════════
+//  FUTURISTIC ADVANCED SVG ICON SYSTEM SUITE
+// ═════════════════════════════════════════════════════════════════════════
+function getFuturisticSvgIcon(key, color, size = 24) {
+  const c = color || '#3B82F6';
+  const s = size;
+  
+  const icons = {
+    dashboard: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.3"/><circle cx="12" cy="12" r="5" stroke-opacity="0.6"/><path d="M12 3v9l5 5"/><circle cx="12" cy="12" r="1.5" fill="${c}"/><path d="M12 12L19 7" stroke="#00F0FF" stroke-width="2"/><circle cx="17" cy="8" r="1" fill="#00F0FF"/></svg>`,
+    action: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><polygon points="12,8 15,14 9,14" fill="${c}" fill-opacity="0.5"/><circle cx="12" cy="12" r="2" fill="#00F0FF"/></svg>`,
+    customer: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.5 8.5 0 0 1 13 0"/><ellipse cx="12" cy="12" rx="10" ry="4" stroke="#00F0FF" stroke-opacity="0.6" stroke-dasharray="2 2"/><circle cx="12" cy="7" r="1.5" fill="#00F0FF"/></svg>`,
+    deals: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 12,22 2,8.5" fill="${c}" fill-opacity="0.15"/><path d="M12 2v20M2 8.5h20M7 5.25l10 6.5"/><circle cx="12" cy="12" r="2.5" fill="#F59E0B"/></svg>`,
+    offers: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7" stroke-width="3" stroke="#00F0FF"/><path d="M9 15l6-6" stroke="#00F0FF"/></svg>`,
+    marketing: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><circle cx="12" cy="3" r="2" fill="#EC4899"/><path d="M19 4a9 9 0 0 1 0 12M5 4a9 9 0 0 0 0 12" stroke="#00F0FF" stroke-opacity="0.6"/></svg>`,
+    telecom: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14 2a6 6 0 0 1 6 6M14 6a2 2 0 0 1 2 2" stroke="#00F0FF" stroke-width="2"/></svg>`,
+    calendar: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3" ry="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2" fill="#8B5CF6"/><path d="M12 13v2l1.5 1.5" stroke="#00F0FF"/></svg>`,
+    tasks: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9v9.8L12 22l-9-4.9V6.9L12 2z" fill="${c}" fill-opacity="0.1"/><polyline points="9 11 12 14 22 4" stroke="#00F0FF" stroke-width="2.2"/></svg>`,
+    billing: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10" stroke-width="2"/><rect x="5" y="14" width="4" height="3" fill="#F59E0B"/><circle cx="17" cy="15.5" r="1.5" fill="#00F0FF"/></svg>`,
+    inventory: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="#00F0FF" stroke-width="2"/></svg>`,
+    support: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/><circle cx="12" cy="12" r="3" fill="#F43F5E" fill-opacity="0.3" stroke="#00F0FF"/></svg>`,
+    documents: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><rect x="9" y="11" width="6" height="6" rx="1" fill="#00F0FF" fill-opacity="0.3"/><circle cx="12" cy="14" r="1" fill="#ffffff"/></svg>`,
+    analytics: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><path d="M3 20h18"/><path d="M5 12l5-5 4 4 6-6" stroke="#00F0FF" stroke-width="2"/><circle cx="20" cy="5" r="1.5" fill="#00F0FF"/></svg>`,
+    search: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><circle cx="11" cy="11" r="3" stroke="#00F0FF" stroke-dasharray="2 2"/><line x1="11" y1="6" x2="11" y2="16" stroke="#00F0FF" stroke-opacity="0.5"/></svg>`,
+    multitenancy: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9.01" y2="6" stroke-width="3"/><line x1="15" y1="6" x2="15.01" y2="6" stroke-width="3"/><line x1="9" y1="10" x2="9.01" y2="10" stroke-width="3"/><line x1="15" y1="10" x2="15.01" y2="10" stroke-width="3"/><line x1="9" y1="14" x2="9.01" y2="14" stroke-width="3"/><line x1="15" y1="14" x2="15.01" y2="14" stroke-width="3"/><path d="M10 22v-4h4v4" fill="#00F0FF"/></svg>`,
+    rbac: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="${c}" fill-opacity="0.15"/><rect x="9" y="10" width="6" height="5" rx="1" stroke="#00F0FF"/><path d="M10 10V8a2 2 0 0 1 4 0v2" stroke="#00F0FF"/></svg>`,
+    recycle: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><circle cx="12" cy="12" r="3" fill="#EC4899" fill-opacity="0.3" stroke="#00F0FF"/></svg>`,
+    audit: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13" stroke="#00F0FF"/><line x1="16" y1="17" x2="8" y2="17" stroke="#00F0FF"/><polyline points="10 9 9 9 8 9"/></svg>`,
+    ai: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="4" fill="${c}" fill-opacity="0.3"/><path d="M12 6v3M12 15v3M6 12h3M15 12h3" stroke="#00F0FF" stroke-width="2"/><circle cx="12" cy="12" r="1.5" fill="#00F0FF"/></svg>`,
+    api: `<svg class="futuristic-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3" stroke="#00F0FF" stroke-width="2"/></svg>`
+  };
+
+  const lookupKey = String(key).toLowerCase();
+  if (lookupKey.includes('1') || lookupKey.includes('dash') || lookupKey.includes('kpi')) return icons.dashboard;
+  if (lookupKey.includes('2') || lookupKey.includes('action') || lookupKey.includes('queue')) return icons.action;
+  if (lookupKey.includes('3') || lookupKey.includes('custom') || lookupKey.includes('account')) return icons.customer;
+  if (lookupKey.includes('4') || lookupKey.includes('deal') || lookupKey.includes('pipel')) return icons.deals;
+  if (lookupKey.includes('5') || lookupKey.includes('offer') || lookupKey.includes('price')) return icons.offers;
+  if (lookupKey.includes('6') || lookupKey.includes('market') || lookupKey.includes('camp')) return icons.marketing;
+  if (lookupKey.includes('7') || lookupKey.includes('tele') || lookupKey.includes('comm')) return icons.telecom;
+  if (lookupKey.includes('8') || lookupKey.includes('meet') || lookupKey.includes('calen')) return icons.calendar;
+  if (lookupKey.includes('9') || lookupKey.includes('task') || lookupKey.includes('recur')) return icons.tasks;
+  if (lookupKey.includes('10') || lookupKey.includes('invoic') || lookupKey.includes('pay') || lookupKey.includes('quote')) return icons.billing;
+  if (lookupKey.includes('11') || lookupKey.includes('product') || lookupKey.includes('wareh')) return icons.inventory;
+  if (lookupKey.includes('12') || lookupKey.includes('support') || lookupKey.includes('ticket')) return icons.support;
+  if (lookupKey.includes('13') || lookupKey.includes('docu') || lookupKey.includes('vault')) return icons.documents;
+  if (lookupKey.includes('14') || lookupKey.includes('report') || lookupKey.includes('analy')) return icons.analytics;
+  if (lookupKey.includes('15') || lookupKey.includes('search') || lookupKey.includes('util')) return icons.search;
+  if (lookupKey.includes('16') || lookupKey.includes('multi') || lookupKey.includes('org')) return icons.multitenancy;
+  if (lookupKey.includes('17') || lookupKey.includes('rbac') || lookupKey.includes('user') || lookupKey.includes('perm')) return icons.rbac;
+  if (lookupKey.includes('18') || lookupKey.includes('recyc') || lookupKey.includes('trash') || lookupKey.includes('loss')) return icons.recycle;
+  if (lookupKey.includes('19') || lookupKey.includes('audit') || lookupKey.includes('qa')) return icons.audit;
+  if (lookupKey.includes('20') || lookupKey.includes('ai') || lookupKey.includes('chat')) return icons.ai;
+  if (lookupKey.includes('21') || lookupKey.includes('api') || lookupKey.includes('integ')) return icons.api;
+
+  return icons[key] || icons.dashboard;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+//  RELCORE CRM MODULES DATA (21 Complete Modules & End-to-End Features)
+// ═════════════════════════════════════════════════════════════════════════
+const modules = [
+  {
+    id: 1, name: "DASHBOARD & COMMAND CENTER", iconKey: "dashboard", color: "#3B82F6",
+    tagline: "Real-Time Executive Intelligence & Approvals",
+    desc: "Central command center aggregating live KPIs, customer counts, sales pipelines, active support queues, overdue invoices, approval workflows (/approvals), and instant quick-action triggers.",
+    submodules: [
+      { name: "Executive KPIs (/dashboard)", iconKey: "dashboard", funcs: ["Active Account Count", "Sales Pipeline Total ($)", "Overdue Invoices", "Today's Meetings", "Open Support Tickets", "Monthly Revenue Run-Rate"] },
+      { name: "Approval Center (/approvals)", iconKey: "rbac", funcs: ["Multi-Tier Approval Workflows", "Discount Approval Matrix", "Quote & Offer Approvals", "Manager Handoff Triggers"] },
+      { name: "Live Activity Stream", iconKey: "action", funcs: ["Real-time Account Feed", "Deal Stage Transitions", "Payment Receipts", "System Notifications", "Audit Stream"] },
+      { name: "Quick Action Center", iconKey: "ai", funcs: ["+ Add Customer", "+ New Deal", "+ Create Invoice", "+ Schedule Meeting", "+ Log Call Outcome"] },
+      { name: "Role-Based Dashboards", iconKey: "multitenant", funcs: ["Sales Executive View", "Manager Dashboard", "Finance & Invoicing View", "Support Lead Center"] }
+    ]
+  },
+  {
+    id: 2, name: "ACTION CENTER & WORK QUEUE", iconKey: "action", color: "#10B981",
+    tagline: "Prioritized Work Execution Engine",
+    desc: "Operational workspace for reps to execute top-priority tasks, follow up on deals, track overdue actions, and instantly sync interaction outcomes.",
+    submodules: [
+      { name: "Prioritized Task Queue (/tasks)", iconKey: "tasks", funcs: ["Smart Priority Sorting", "Overdue Task Alerts", "High-Value Deal Triggers", "Due Today Focus List"] },
+      { name: "1-Click Execution", iconKey: "action", funcs: ["Inline Call Logging", "Meeting Notes Entry", "Quick Email Dispatch", "Instant Task Completion"] },
+      { name: "SLA & Overdue Monitor", iconKey: "support", funcs: ["Ticket SLA Breach Warnings", "Payment Follow-up Queue", "Stagnant Deal Reminders"] },
+      { name: "360° Sync Engine", iconKey: "customer", funcs: ["Auto Timeline Logging", "Customer Account Update", "Deal Activity Broadcast"] }
+    ]
+  },
+  {
+    id: 3, name: "CUSTOMER 360°, ADVANCES & CONTACTS", iconKey: "customer", color: "#8B5CF6",
+    tagline: "Single Source of Customer Truth",
+    desc: "Holistic 360-degree account intelligence view capturing company profiles, customer advances (/customer-advances), credit deposits, contact directories, interactive timelines, and health scoring.",
+    submodules: [
+      { name: "Account Master (/customers)", iconKey: "multitenant", funcs: ["Company Profile & Industry", "GST / Tax Identification", "Billing & Shipping Addresses", "Parent / Child Account Hierarchy"] },
+      { name: "Customer Advances & Credits (/customer-advances)", iconKey: "billing", funcs: ["Advance Payment Deposit", "Credit Ledger Balance", "Advance Adjustment in Invoice", "Customer Ledger Report"] },
+      { name: "Customer 360° Timeline", iconKey: "calendar", funcs: ["Unified Email History", "Call & Meeting Logs", "Quote & Invoice History", "Support Tickets History", "Uploaded Documents"] },
+      { name: "Contact Directory", iconKey: "telecom", funcs: ["Multi-Contact Management", "Role & Decision Maker Tags", "Direct Phone & Email", "Social & LinkedIn Profiles"] },
+      { name: "Health & Intent Scoring", iconKey: "analytics", funcs: ["Engagement Score", "Buying Intent Index", "Lifetime Value (LTV)", "Churn Risk Warnings"] }
+    ]
+  },
+  {
+    id: 4, name: "SALES PIPELINE & DEALS", iconKey: "deals", color: "#F59E0B",
+    tagline: "Revenue Pipeline Acceleration Platform",
+    desc: "Visual drag-and-drop Kanban deal pipeline with multi-stage progression, deal products breakdown, win probabilities, AI stagnation alerts, AI deal suggestions (/deals/suggestions), and revenue forecasting.",
+    submodules: [
+      { name: "Kanban Pipeline (/deals/pipeline)", iconKey: "deals", funcs: ["Multi-Stage Drag & Drop", "Lead & Qualification", "Proposal & Demo", "Negotiation & Closed Won", "Custom Stage Rules"] },
+      { name: "Deal Intelligence & Products", iconKey: "inventory", funcs: ["Deal Value & Win Probability", "Expected Close Date", "Deal Owner Assignment", "Deal Line Products Breakdown"] },
+      { name: "AI Deal Suggestions (/deals/suggestions)", iconKey: "ai", funcs: ["Deal Stagnation Alerts", "Win-Rate Predictions", "Next-Best-Action Prompts", "Deal Velocity Metrics"] },
+      { name: "Stage Automations", iconKey: "api", funcs: ["Auto Task Assignment", "Stage Transition Notifications", "Manager Escalations", "Quote Auto-Generation"] }
+    ]
+  },
+  {
+    id: 5, name: "OFFERS, PROPOSALS & PRICE BOOKS", iconKey: "offers", color: "#6366F1",
+    tagline: "Commercial Offer & Pricing Architecture",
+    desc: "Manage commercial offers (/offers), custom proposal bundles, multi-tier price books (/price-books), volume discount rules, and promotional pricing structures.",
+    submodules: [
+      { name: "Promotional Offers (/offers)", iconKey: "offers", funcs: ["Special Offer Builder", "Bundled Product Discounts", "Validity Period Limits", "Offer Application to Deals"] },
+      { name: "Price Book Catalog (/price-books)", iconKey: "billing", funcs: ["Multi-Tier Price Lists", "Customer-Specific Pricing", "Currency Matrix", "Price Book Item Mapping"] },
+      { name: "Proposal Bundles", iconKey: "documents", funcs: ["Custom Proposal Templates", "Standard Terms & Conditions", "Product Bundle Packages", "Margin & Markup Tracker"] }
+    ]
+  },
+  {
+    id: 6, name: "MARKETING HUB & AI AUTOMATION", iconKey: "marketing", color: "#EC4899",
+    tagline: "Omnichannel Engagement & Lead Nurturing",
+    desc: "Comprehensive marketing platform featuring segment builders, email/SMS campaigns, AI content generator, unified marketing calendar, trigger automations, and lead scoring.",
+    submodules: [
+      { name: "Marketing Overview (/marketing)", iconKey: "marketing", funcs: ["Campaign Performance Overview", "Lead Growth Matrix", "Active Automation Workflows"] },
+      { name: "Email & SMS Campaigns (/marketing/campaigns)", iconKey: "marketing", funcs: ["Email Broadcast Campaigns", "SMS Campaign Sender", "Scheduled Delivery", "Open & Click Tracking"] },
+      { name: "Customer Segments (/marketing/segments)", iconKey: "customer", funcs: ["Dynamic Demographic Rules", "Purchase History Filters", "Activity & Engagement Tags", "Custom Query Builder"] },
+      { name: "Marketing Automations (/marketing/automations)", iconKey: "api", funcs: ["Inactive Customer Trigger", "First Purchase Flow", "Tag Addition Workflows", "Multi-Step Delays & Actions"] },
+      { name: "Email Templates (/marketing/templates)", iconKey: "documents", funcs: ["Visual Drag-and-Drop Builder", "Personalization Merges", "Template Gallery"] },
+      { name: "Lead Scoring (/marketing/lead-scores)", iconKey: "analytics", funcs: ["Behavioral Scoring Models", "Demographic Points", "MQL Threshold Triggers", "Sales Handoff Rules"] },
+      { name: "Marketing Calendar (/marketing/calendar)", iconKey: "calendar", funcs: ["Unified Campaign Planner", "Content Delivery Timelines", "Event Scheduler"] }
+    ]
+  },
+  {
+    id: 7, name: "COMMUNICATION & TELEPHONY", iconKey: "telecom", color: "#06B6D4",
+    tagline: "Unified Email Inbox & Call Logging Hub",
+    desc: "Seamless corporate email integration (/email), phone call logging & notes (/calls), real-time tracking pixels, SendGrid webhooks, and 1-click unsubscribe compliance.",
+    submodules: [
+      { name: "Integrated Email Inbox (/email)", iconKey: "telecom", funcs: ["IMAP / SMTP Sync", "Send & Receive in CRM", "Shared Team Inbox", "Unread Counter Badges"] },
+      { name: "Telephony & Call Logs (/calls)", iconKey: "telecom", funcs: ["Call Outcome Logger", "Call Duration & Notes", "Follow-up Meeting Trigger", "Call History on 360° Timeline"] },
+      { name: "Tracking & Webhooks", iconKey: "api", funcs: ["Real-time Open Pixel", "Link Click Tracker", "SendGrid Webhook Sync", "Bounce & Spam Alerts"] },
+      { name: "Unsubscribe Portal", iconKey: "rbac", funcs: ["1-Click Unsubscribe Page", "Suppression List", "CAN-SPAM Compliance", "Opt-out Audit Log"] }
+    ]
+  },
+  {
+    id: 8, name: "MEETINGS & CALENDAR", iconKey: "calendar", color: "#8B5CF6",
+    tagline: "Smart Scheduling & Video Integration",
+    desc: "Internal and external meeting manager (/meetings/calendar) with 2-way Google Calendar synchronization, Zoom integration, automatic reminders, and attendee RSVP tracking.",
+    submodules: [
+      { name: "Meeting Scheduler (/meetings/calendar)", iconKey: "calendar", funcs: ["Organizer & Attendee Picker", "Meeting Type & Venue", "Linked Customer / Deal", "Meeting Notes & Agenda"] },
+      { name: "Interactive Calendar View", iconKey: "calendar", funcs: ["Month / Week / Day Views", "Color-coded Categories", "Drag & Drop Rescheduling", "Today's Agenda Widget"] },
+      { name: "Google & Zoom Sync", iconKey: "api", funcs: ["Google Calendar 2-Way Sync", "Auto Zoom Link Generator", "Calendar Invites (.ics)", "Virtual Room Link"] },
+      { name: "Reminders & RSVPs", iconKey: "action", funcs: ["Automated Email Reminders", "Attendee RSVP Tracker", "Follow-up Task Creation"] }
+    ]
+  },
+  {
+    id: 9, name: "TASKS & RECURRING WORKFLOWS", iconKey: "tasks", color: "#10B981",
+    tagline: "Task Operations & Scheduler Engine",
+    desc: "Complete task management (/tasks) with entity linkage, priority flags, recurring task automation, Kanban view, and background reminder dispatchers.",
+    submodules: [
+      { name: "Task Operations (/tasks)", iconKey: "tasks", funcs: ["Assignee & Due Date", "Low / Medium / High / Urgent Priority", "Status Tracking", "Subtask Checklists"] },
+      { name: "Multi-Entity Linkage", iconKey: "api", funcs: ["Link to Customer Account", "Link to Sales Deal", "Link to Invoice", "Link to Support Ticket"] },
+      { name: "Task Views", iconKey: "dashboard", funcs: ["My Tasks View", "Team Task Delegation", "Kanban Board", "Calendar Task View"] },
+      { name: "Recurring & Reminders", iconKey: "calendar", funcs: ["Daily/Weekly/Monthly Recurring", "5-Min Polling Reminder Engine", "In-App & Email Notifications"] }
+    ]
+  },
+  {
+    id: 10, name: "INVOICES, QUOTES & PAYMENTS", iconKey: "billing", color: "#F59E0B",
+    tagline: "End-to-End Billing, MYOB & Razorpay Integration",
+    desc: "Interactive quote (/quotes) and invoice (/invoices) builders, automated PDF generation, public payment portals, Razorpay webhooks, MYOB Accounting integration, and refund modals (/revenue-recovery).",
+    submodules: [
+      { name: "Quote Builder (/quotes)", iconKey: "documents", funcs: ["Interactive Line Items", "Discounts & Taxes", "Public Quote Link", "1-Click Client Approval"] },
+      { name: "Invoice Lifecycle (/invoices)", iconKey: "billing", funcs: ["Draft / Sent / Paid / Overdue", "Automated PDF Generator", "Email Invoice Dispatch", "Partial Payment Tracking"] },
+      { name: "Razorpay & Gateway Sync", iconKey: "billing", funcs: ["Public Payment Portal Link", "Razorpay Webhook Auto-Sync", "Instant Receipt Generation", "Payment Gateway Status"] },
+      { name: "MYOB Accounting Sync", iconKey: "api", funcs: ["2-Way Invoice Sync", "Customer Ledger Alignment", "Tax Code Mapping", "Financial Reconciliation"] },
+      { name: "Revenue Recovery & Refunds (/revenue-recovery)", iconKey: "recycle", funcs: ["Auto Overdue Marker", "Recurring Payment Reminders", "Refund Management Modal", "Quantity Refund Tracker"] }
+    ]
+  },
+  {
+    id: 11, name: "PRODUCTS & WAREHOUSE INVENTORY", iconKey: "inventory", color: "#3B82F6",
+    tagline: "Multi-Warehouse Stock & Transfer Engine",
+    desc: "Product catalog management (/products), multi-warehouse stock tracking (/inventory), stock transfer warning logic, dead stock clearance actions (/dead-stock-actions), and inventory valuation.",
+    submodules: [
+      { name: "Product Master (/products)", iconKey: "inventory", funcs: ["Product SKU & Category", "Unit Price & Tax Rates", "Stock Levels", "Custom Specifications"] },
+      { name: "Multi-Warehouse Inventory (/inventory)", iconKey: "multitenant", funcs: ["Multi-Warehouse Locations", "Warehouse Stock Transfer", "Transfer Warning Logic", "Reorder Threshold Alerts"] },
+      { name: "Dead Stock Actions (/dead-stock-actions)", iconKey: "action", funcs: ["Dead Stock Identifier", "Clearance Action Trigger", "Inventory Valuation Report", "Stock Replenishment Queue"] }
+    ]
+  },
+  {
+    id: 12, name: "SUPPORT TICKETS & CUSTOMER PORTAL", iconKey: "support", color: "#F43F5E",
+    tagline: "Customer Service & SLA Management",
+    desc: "Support ticket ticketing system (/tickets), customer self-service portal (/portal), live AI chatbot assistant, SLA breach monitors, agent escalation routes, and ticket-to-task conversions.",
+    submodules: [
+      { name: "Help Desk Operations (/tickets)", iconKey: "support", funcs: ["Ticket Number & Category", "Priority & Status Tracking", "Agent Assignment", "Customer Account Link"] },
+      { name: "Customer Portal & Bot (/portal)", iconKey: "ai", funcs: ["Public Self-Service Portal", "Submit New Ticket", "Live Ticket Status Check", "Portal AI Chatbot Assistant"] },
+      { name: "SLA Escalation Engine", iconKey: "action", funcs: ["SLA Countdown Timers", "Breach Warning Alerts", "Automated Supervisor Escalation"] },
+      { name: "Resolution Center", iconKey: "support", funcs: ["Internal Agent Notes", "Customer Email Thread", "File Attachments", "Ticket-to-Task Escalation"] }
+    ]
+  },
+  {
+    id: 13, name: "DOCUMENT MANAGEMENT", iconKey: "documents", color: "#06B6D4",
+    tagline: "Cloud Document Repository & Vault",
+    desc: "Centralized document repository (/documents) with tenant storage, entity attachments, automated report export archives, and role-based security.",
+    submodules: [
+      { name: "Central Storage Vault (/documents)", iconKey: "documents", funcs: ["Tenant Cloud Storage", "Folder Hierarchy", "File Search & Tagging", "Version Control"] },
+      { name: "Entity Document Attachments", iconKey: "api", funcs: ["Attach to Customer Account", "Attach to Sales Deal", "Attach to Invoice", "Attach to Support Ticket"] },
+      { name: "Export Auto-Save", iconKey: "analytics", funcs: ["Auto-Save Scheduled Reports", "PDF / Excel Storage", "Public Sharing Links", "Expiration Config"] },
+      { name: "Document Security", iconKey: "rbac", funcs: ["Role View / Edit Rights", "Download Audit Logging", "Encrypted Cloud Storage"] }
+    ]
+  },
+  {
+    id: 14, name: "CUSTOM REPORT BUILDER & ANALYTICS", iconKey: "analytics", color: "#8B5CF6",
+    tagline: "Business Intelligence & Drag-and-Drop Report Builder",
+    desc: "Executive analytics dashboards (/analytics), standard reports catalog (/reports), custom drag-and-drop report builder (/reports/builder), and scheduled email exports (/reports/schedules).",
+    submodules: [
+      { name: "Custom Report Builder (/reports/builder)", iconKey: "analytics", funcs: ["Multi-Entity Data Engine", "Drag & Drop Column Selector", "Dynamic Multi-Field Filters", "Saved Custom Templates", "Visual Chart Canvas"] },
+      { name: "Executive Analytics (/analytics)", iconKey: "dashboard", funcs: ["Sales Performance Metrics", "Pipeline Conversion Rates", "Revenue Trends", "Support SLA Resolution Matrix"] },
+      { name: "Standard Reports Catalog (/reports)", iconKey: "documents", funcs: ["Customer Acquisition Report", "Sales Rep Leaderboard", "Financial Ledger Statements", "Inventory Valuation Summary"] },
+      { name: "Scheduled Email Exports (/reports/schedules)", iconKey: "calendar", funcs: ["Automated Recurring Dispatcher", "PDF / Excel Attachments", "Recipient Distribution Groups", "Document Vault Storage Archive"] }
+    ]
+  },
+  {
+    id: 15, name: "GLOBAL SEARCH & HELP HUB", iconKey: "search", color: "#10B981",
+    tagline: "Instant System-Wide Search & User Manuals",
+    desc: "Instant global search engine across all CRM entities with keyboard shortcuts (Ctrl+K), quick action shortcuts, user documentation hub (/help), and Help Desk guides.",
+    submodules: [
+      { name: "Global Instant Search", iconKey: "search", funcs: ["Ctrl + K Hotkey", "Cross-Module Instant Search", "Customer & Deal Search", "Invoice & Ticket Search"] },
+      { name: "User Manuals Hub (/help)", iconKey: "documents", funcs: ["System User Manuals", "Feature Documentation", "Video Walkthrough Guides", "FAQ Knowledge Base"] }
+    ]
+  },
+  {
+    id: 16, name: "MULTITENANCY & ORG ADMIN", iconKey: "multitenancy", color: "#3B82F6",
+    tagline: "Multi-Tenant Workspace & Super Admin Hub",
+    desc: "Enterprise workspace data isolation, custom domain branding & settings (/settings), topbar Super Admin tenant switcher (/admin/tenants), and maintenance mode controls.",
+    submodules: [
+      { name: "Workspace Isolation", iconKey: "rbac", funcs: ["Tenant Data Separation", "Subdomain Resolution", "Custom Organization Settings", "Timezone & Currency Config"] },
+      { name: "Branding & Settings (/settings)", iconKey: "multitenancy", funcs: ["Company Logo Upload", "Favicon & Icons", "Primary Color Theme", "Login Background Branding"] },
+      { name: "Super Admin Switcher (/admin/tenants)", iconKey: "api", funcs: ["Instant Tenant Switcher", "Cross-Tenant Audit", "Global Tenant Directory"] },
+      { name: "Maintenance Control", iconKey: "action", funcs: ["Service Mode Toggle", "Custom Maintenance Message", "ETA Display", "Emergency Support Contacts"] }
+    ]
+  },
+  {
+    id: 17, name: "USER MANAGEMENT, RBAC & MFA", iconKey: "rbac", color: "#F59E0B",
+    tagline: "Granular Access Control, Team & MFA Security",
+    desc: "Role-Based Access Control matrix (/roles), team user management (/users), custom roles, Multi-Factor Authentication (MFA & TOTP QR) (/mfa), and active session controls.",
+    submodules: [
+      { name: "Team Management (/users)", iconKey: "rbac", funcs: ["User Directory", "Sales Representative Roles", "Manager Assignments", "Invite New Team Members"] },
+      { name: "RBAC Matrix & Permissions (/roles)", iconKey: "rbac", funcs: ["Super Admin & Tenant Admin", "Sales Manager & Sales Rep", "Module-Level CRUD Rights", "Field-Level Access Limits"] },
+      { name: "Multi-Factor Authentication (/mfa)", iconKey: "rbac", funcs: ["TOTP QR Code Authenticator", "Backup Recovery Keys", "Enforced MFA Policies", "Google OAuth Sign-in"] },
+      { name: "Session Monitor", iconKey: "audit", funcs: ["Active Session Tracker", "Remote Session Revoke", "IP Lockouts"] }
+    ]
+  },
+  {
+    id: 18, name: "RECYCLE BIN & DATA LOSS PREVENTION", iconKey: "recycle", color: "#EC4899",
+    tagline: "Soft-Delete Safety Net & Auto Purge",
+    desc: "Accidental data loss protection across all modules, single-click restoration, unified recycle bin hub (`/recycle-bin`), and auto-purge scheduler.",
+    submodules: [
+      { name: "Soft-Delete Safety Net", iconKey: "rbac", funcs: ["Protected Customers & Contacts", "Protected Deals & Invoices", "Protected Tasks & Tickets", "Protected Documents"] },
+      { name: "Recycle Bin Hub (/recycle-bin)", iconKey: "recycle", funcs: ["Module Tabbed View", "Deleted-By Metadata", "Deletion Timestamp", "Record Detail Inspection"] },
+      { name: "Restoration & Purge", iconKey: "recycle", funcs: ["1-Click Record Restore", "Permanent Delete Option", "Configurable Retention (e.g. 30 Days)", "Automated Purge Scheduler"] }
+    ]
+  },
+  {
+    id: 19, name: "AUDIT LOGS & QA DIAGNOSTICS", iconKey: "audit", color: "#06B6D4",
+    tagline: "Operational Audit Trail & Audit Insights Hub",
+    desc: "Automated event logging of authentication, setting updates, role edits, data exports, recycle bin actions, Audit Insights (/audit-logs/insights), and automated QA test reports (/qa-test-reports).",
+    submodules: [
+      { name: "Audit Insights Hub (/audit-logs/insights)", iconKey: "audit", funcs: ["User Activity Timelines", "IP & Geo Location Track", "Security Violation Alerts", "Data Export Audits"] },
+      { name: "Operational Audit Stream", iconKey: "audit", funcs: ["Login / Logout & Reset Events", "Setting Change Audits", "Role & Permission Edits"] },
+      { name: "QA Diagnostics & Reports (/qa-test-reports)", iconKey: "analytics", funcs: ["QA Test Report Suite", "Diagnostic System Checks", "Database Integrity Monitor"] }
+    ]
+  },
+  {
+    id: 20, name: "AI FEATURES & AUTOMATION SUITE", iconKey: "ai", color: "#8B5CF6",
+    tagline: "Predictive AI Insights, Chatbot & Queue Diagnostics",
+    desc: "AI-driven deal predictions (/ai-features), natural language CRM chatbot assistant (/crm-chatbot), next-best-action alerts, and background queue worker diagnostics (/admin/queue-monitor).",
+    submodules: [
+      { name: "AI Deal Recommendations (/ai-features)", iconKey: "ai", funcs: ["Predictive Win Probability", "Stagnation Alert Prompts", "Next-Best-Action Guidance"] },
+      { name: "AI CRM Chatbot Assistant (/crm-chatbot)", iconKey: "ai", funcs: ["Natural Language Record Search", "Report Summary Generator", "1-Click Quick Actions", "Public Customer Bot"] },
+      { name: "Queue Monitoring & Diagnostics (/admin/queue-monitor)", iconKey: "api", funcs: ["Background Queue Monitor", "Job Failure Diagnostics", "Auto-Retry Worker", "Queue Performance Metrics"] }
+    ]
+  },
+  {
+    id: 21, name: "DEVELOPER INTEGRATIONS & APIS", iconKey: "api", color: "#10B981",
+    tagline: "Extensible Ecosystem, MYOB & Webhooks",
+    desc: "2-Way Google & Zoom integrations, MYOB accounting integration, real-time incoming SendGrid & Razorpay email webhooks, secure token REST APIs.",
+    submodules: [
+      { name: "Integrations Hub (/integrations)", iconKey: "api", funcs: ["MYOB EXO Accounting Integration", "Google Calendar 2-Way Sync", "Zoom Video Meetings API", "SendGrid Mailer"] },
+      { name: "Real-time Webhook Engine", iconKey: "api", funcs: ["SendGrid Email Webhooks", "Razorpay Payment Webhooks", "Delivery & Bounce Events"] },
+      { name: "REST API Suite", iconKey: "api", funcs: ["Token-Based Auth", "API Rate Limiting", "Swagger / OpenAPI Docs", "API Security Standards"] }
+    ]
+  }
+];
+
+const COLORS = ["#3B82F6","#10B981","#8B5CF6","#F59E0B","#6366F1","#EC4899","#06B6D4","#8B5CF6","#10B981","#F59E0B","#3B82F6","#F43F5E","#06B6D4","#8B5CF6","#10B981","#3B82F6","#F59E0B","#EC4899","#06B6D4","#8B5CF6","#10B981"];
+
+function buildBg() {
+  const bg = document.getElementById('animBg');
+  COLORS.forEach((c, i) => {
+    const d = document.createElement('div'); d.className = 'bg-orb';
+    const s = 220 + Math.random() * 400;
+    d.style.cssText = `width:${s}px;height:${s}px;background:${c};left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${i*1.5}s;animation-duration:${25+i*2}s`;
+    bg.appendChild(d);
+  });
+
+  const sb = document.getElementById('starsBg');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div'); s.className = 'star';
+    const sz = Math.random() * 2 + 1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${2+Math.random()*4}s`;
+    sb.appendChild(s);
+  }
+}
+
+function initParticleCanvas() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const particles = [];
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 2 + 1,
+      color: COLORS[i % COLORS.length]
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.4;
+      ctx.fill();
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x, dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = (1 - dist / 120) * 0.12;
+          ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function buildSlides() {
+  const container = document.getElementById('slides-container');
+  const allSlides = [];
+
+  // ── 1. COVER TITLE SLIDE ──
+  const t = document.createElement('div');
+  t.className = 'slide active'; t.dataset.index = 0;
+  t.innerHTML = `
+    <div class="title-slide">
+      <div class="logo-ring-wrap">
+        <div class="logo-outer-ring"></div>
+        <div class="logo-inner-ring"></div>
+        <div class="logo-circle">
+          <img src="https://knrint-website.blr1.digitaloceanspaces.com/KNR-WEBSITE/2026/portfolio/KNR-WEBSITE_5ca81605-0654-4ee7-ac04-412e675862e5_RELcore.webp" alt="RELcore Logo" class="relcore-logo-img" onerror="this.onerror=null; this.src='https://knrint-website.blr1.digitaloceanspaces.com/KNR-WEBSITE/2026/portfolio/KNR-WEBSITE_5ca81605-0654-4ee7-ac04-412e675862e5_RELcore.webp';"/>
+        </div>
+      </div>
+      <div class="title-expand">
+        <span style="font-size:clamp(0.7rem, 1.2vw, 0.9rem); letter-spacing:0.25em; color:var(--neon); font-weight:800; text-transform:uppercase; display:block; margin-bottom:0.4rem">
+          ENTERPRISE BUSINESS & CRM PLATFORM
+        </span>
+        <div class="tagline">THE COMPLETE RELCORE ENTERPRISE OS</div>
+        <div class="subtitle">Unified &bull; Intelligent &bull; Automated &bull; Scalable</div>
+        <div class="title-divider"></div>
+        <div class="stats-row">
+          <div class="title-stat"><div class="num">21</div><div class="lbl">Core Modules</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">210+</div><div class="lbl">End-to-End Features</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">360°</div><div class="lbl">Customer Intelligence</div></div>
+          <div class="title-stat stat-sep"></div>
+          <div class="title-stat"><div class="num">100%</div><div class="lbl">Multi-Tenant Security</div></div>
+        </div>
+        <div style="display:flex; gap:0.6rem; justify-content:center; margin-top:1.8rem; flex-wrap:wrap;">
+          <span class="pill-badge" style="--pc:var(--electric)" onclick="goToSlide(2)" title="Jump to Executive Dashboard">${getFuturisticSvgIcon('dashboard', '#3B82F6', 16)} Executives</span>
+          <span class="pill-badge" style="--pc:var(--emerald)" onclick="goToSlide(5)" title="Jump to Sales & Deals">${getFuturisticSvgIcon('deals', '#10B981', 16)} Sales & Deals</span>
+          <span class="pill-badge" style="--pc:var(--amber)" onclick="goToSlide(11)" title="Jump to Finance & Billing">${getFuturisticSvgIcon('billing', '#F59E0B', 16)} Finance & Billing</span>
+          <span class="pill-badge" style="--pc:var(--rose)" onclick="goToSlide(13)" title="Jump to Support & Service">${getFuturisticSvgIcon('support', '#F43F5E', 16)} Support & Service</span>
+          <span class="pill-badge" style="--pc:var(--purple)" onclick="goToSlide(7)" title="Jump to Marketing Hub">${getFuturisticSvgIcon('marketing', '#8B5CF6', 16)} Marketing Hub</span>
+          <span class="pill-badge" style="--pc:var(--cyan)" onclick="goToSlide(18)" title="Jump to Security & Audit">${getFuturisticSvgIcon('rbac', '#06B6D4', 16)} Security & Audit</span>
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(t); allSlides.push(t);
+
+  // ── 2. PLATFORM OVERVIEW SLIDE ──
+  const ov = document.createElement('div');
+  ov.className = 'slide'; ov.dataset.index = 1;
+  ov.innerHTML = `
+    <div class="overview-slide">
+      <div class="slide-header">
+        <div class="eyebrow">Platform Architecture</div>
+        <h2 style="background:linear-gradient(135deg, #fff, var(--neon)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text">
+          21 Core Modules & Feature Suite
+        </h2>
+        <p style="color:rgba(255, 255, 255, 0.6); margin-top:0.3rem; font-size:0.9rem">Click any module card below to explore full capabilities & features</p>
+      </div>
+      <div class="modules-grid">
+        ${modules.map((m, i) => `
+          <div class="mod-chip" style="--chip-color:${m.color}" onclick="goToSlide(${i + 2})" title="${m.name}">
+            <div class="chip-icon">${getFuturisticSvgIcon(m.iconKey, m.color, 26)}</div>
+            <div class="chip-name">${m.name}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  container.appendChild(ov); allSlides.push(ov);
+
+  // ── 3-23. MODULE SLIDES (21 MODULES) ──
+  modules.forEach((m, i) => {
+    const s = document.createElement('div');
+    s.className = 'slide'; s.dataset.index = i + 2;
+    const numCols = m.submodules.length <= 2 ? 'grid-1' : m.submodules.length <= 4 ? 'grid-2' : 'grid-3';
+
+    s.innerHTML = `
+      <div class="module-slide">
+        <div class="mod-glow" style="background:${m.color}"></div>
+        <div class="mod-header">
+          <div class="mod-icon-wrap" style="--mod-color:${m.color}; background:linear-gradient(135deg, ${m.color}cc, #0a0e27)">
+            ${getFuturisticSvgIcon(m.iconKey, '#ffffff', 42)}
+          </div>
+          <div>
+            <div class="mod-number" style="color:${m.color}">MODULE ${String(m.id).padStart(2, '0')} / 21</div>
+            <div class="mod-title" style="background:linear-gradient(135deg, #fff, ${m.color}); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text">${m.name}</div>
+            <div class="mod-tagline">${m.tagline}</div>
+          </div>
+        </div>
+        <div class="mod-description" style="border-color:${m.color}">${m.desc}</div>
+        <div class="submodules-grid ${numCols}">
+          ${m.submodules.map((sub) => `
+            <div class="submodule-card" onclick="openSubmoduleModal('${sub.name.replace(/'/g, "\\'")}', '${m.name.replace(/'/g, "\\'")}', '${m.color}', '${sub.iconKey}')">
+              <div style="position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:2px 0 0 2px; background:${m.color}"></div>
+              <div class="sub-name" style="color:${m.color}">
+                ${getFuturisticSvgIcon(sub.iconKey || m.iconKey, m.color, 20)} <span>${sub.name}</span>
+              </div>
+              <div class="funcs-wrap">
+                ${sub.funcs.map(f => `<span class="func-tag" style="border-color:${m.color}44; color:rgba(255,255,255,0.9)" onclick="event.stopPropagation(); openFeatureModal('${f.replace(/'/g, "\\'")}', '${sub.name.replace(/'/g, "\\'")}', '${m.name.replace(/'/g, "\\'")}', '${m.color}', '${sub.iconKey}')">${getFuturisticSvgIcon('search', '#00F0FF', 12)} ${f}</span>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    container.appendChild(s); allSlides.push(s);
+  });
+
+  // ── 24. CLOSER SLIDE WITH WEBSITE & ADMIN PORTAL BUTTONS ──
+  const cl = document.createElement('div');
+  cl.className = 'slide'; cl.dataset.index = modules.length + 2;
+  cl.innerHTML = `
+    <div class="closer-slide">
+      <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--neon); font-weight:800; margin-bottom:0.8rem">Transform Your Enterprise</div>
+      <h2>Ready to Experience RELcore?</h2>
+      <div class="sub">RELcore — Where Every Feature Delivers Maximum ROI & Operational Excellence</div>
+      <div class="closer-modules-list">
+        ${modules.map((m, i) => `<span class="closer-chip" style="border-color:${m.color}66; color:${m.color}" onclick="goToSlide(${i + 2})" title="Navigate to ${m.name}">${getFuturisticSvgIcon(m.iconKey, m.color, 16)} ${m.name}</span>`).join('')}
+      </div>
+      <div class="cta-wrap">
+        <a href="https://relcore.rescom.in/" target="_blank" class="cta-btn cta-primary">
+          ${getFuturisticSvgIcon('multitenant', '#ffffff', 20)} Visit RELcore Website
+        </a>
+        <a href="https://relcore.rescom.in/admin/login" target="_blank" class="cta-btn cta-admin">
+          ${getFuturisticSvgIcon('rbac', '#ffffff', 20)} Visit RELcore Admin Portal
+        </a>
+        <button class="cta-btn cta-secondary" onclick="goToSlide(0)">&#8592; Back to Cover</button>
+        <button class="cta-btn cta-secondary" onclick="goToSlide(1)">View All Modules</button>
+      </div>
+      <div style="margin-top:2rem; color:rgba(255,255,255,0.45); font-size:0.88rem; font-weight:600">
+        21 Core Modules &bull; 210+ Features &bull; Multi-Tenant Operating System &bull; <span style="color:var(--neon)">RELcore CRM</span>
+      </div>
+    </div>`;
+  container.appendChild(cl); allSlides.push(cl);
+
+  return allSlides;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+//  INTERACTIVE FEATURE POPUP MODAL GENERATOR & CONTROLLER
+// ═════════════════════════════════════════════════════════════════════════
+function openFeatureModal(featureName, subName, modName, color, iconKey) {
+  const modal = document.getElementById('featureModal');
+  const card = document.getElementById('modalCard');
+  card.style.setProperty('--modal-color', color || '#3B82F6');
+
+  document.getElementById('modalModBadge').innerText = modName || 'RELCORE MODULE';
+  document.getElementById('modalModBadge').style.borderColor = color;
+  document.getElementById('modalModBadge').style.color = color;
+  document.getElementById('modalTitle').innerHTML = `${getFuturisticSvgIcon(iconKey || 'dashboard', color, 28)} <span>${featureName}</span>`;
+  document.getElementById('modalSubTitle').innerText = `Submodule: ${subName} • Enterprise Capability Deep Dive`;
+
+  const details = generateFeatureDeepDive(featureName, subName, modName);
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-section" style="border-left: 4px solid ${color}">
+      <div class="modal-section-title" style="color: ${color}">📖 Feature Overview & Purpose</div>
+      <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.85); line-height: 1.6;">${details.overview}</p>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title" style="color: var(--neon)">⚡ Core Technical Capabilities</div>
+      <ul class="modal-list">
+        ${details.capabilities.map(c => `<li>${c}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title" style="color: var(--gold)">🎯 Client Impact & ROI</div>
+      <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.82); line-height: 1.6;">${details.impact}</p>
+    </div>
+
+    <div class="modal-ui-preview">
+      <div>
+        <strong style="color:${color}; display:block; margin-bottom: 0.2rem;">Live System Status Indicator:</strong>
+        <span style="opacity: 0.7;">State: </span> <span style="color:#10B981; font-weight: bold;">ACTIVE & READY</span> &bull; 
+        <span style="opacity: 0.7;">Module: </span> ${modName}
+      </div>
+      <span style="background: rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; color: var(--neon)">RELcore v2.4</span>
+    </div>
+  `;
+
+  modal.classList.add('active');
+}
+
+function openSubmoduleModal(subName, modName, color, iconKey) {
+  openFeatureModal(`${subName} Management Suite`, subName, modName, color, iconKey);
+}
+
+function closeFeatureModal(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  document.getElementById('featureModal').classList.remove('active');
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeFeatureModal();
+});
+
+function generateFeatureDeepDive(fName, subName, modName) {
+  const key = fName.toLowerCase();
+  
+  if (key.includes('mfa') || key.includes('totp') || key.includes('qr')) {
+    return {
+      overview: "Multi-Factor Authentication (MFA) security framework enforcing Time-based One-Time Passwords (TOTP) via authenticator apps (Google Authenticator, Authy) with QR code setup and emergency recovery keys.",
+      capabilities: [
+        "Interactive QR code generation for 1-click authenticator pairing",
+        "Encrypted backup recovery keys for account retrieval",
+        "Role-based enforced MFA policy settings (e.g. mandatory MFA for Admins)",
+        "Single Sign-On (SSO) and Google OAuth integration compatibility"
+      ],
+      impact: "Provides 100% protection against credential theft and brute-force access attempts across enterprise teams."
+    };
+  }
+
+  if (key.includes('approval') || key.includes('discount approval')) {
+    return {
+      overview: "Multi-tier approval engine (`/approvals`) regulating quote discounts, special commercial pricing, and high-value deal stage transitions before client delivery.",
+      capabilities: [
+        "Custom approval threshold triggers (e.g. discounts > 15% require Sales Director sign-off)",
+        "1-Click approve/reject actions with inline manager notes",
+        "Automated notification triggers dispatched to decision makers",
+        "Complete approval trail recorded on Customer 360° timeline"
+      ],
+      impact: "Protects profit margins and guarantees corporate compliance across all commercial quotes."
+    };
+  }
+
+  if (key.includes('qa') || key.includes('test report') || key.includes('diagnostic')) {
+    return {
+      overview: "Automated QA Diagnostic & Test Reporting engine (`/qa-test-reports`) executing automated system health checks, database integrity monitors, and API latency audits.",
+      capabilities: [
+        "Automated QA test suite runner checking database relationships and schema integrity",
+        "System latency, queue worker, and external API diagnostic metrics",
+        "Exportable PDF/Excel QA compliance reports",
+        "Real-time failure alerts dispatched to system administrators"
+      ],
+      impact: "Ensures 99.99% system uptime, zero silent database corruptions, and immediate resolution of infrastructure anomalies."
+    };
+  }
+
+  if (key.includes('builder') || key.includes('report builder')) {
+    return {
+      overview: "Interactive drag-and-drop custom report builder (`/reports/builder`) allowing users to dynamically select CRM entities, join dataset fields, apply multi-condition filters, and visualize custom charts.",
+      capabilities: [
+        "Drag-and-drop entity and field selector supporting Deals, Accounts, Invoices, Tasks, and Tickets",
+        "Dynamic multi-field filter builder with nested AND/OR logical rules",
+        "Visual chart generator supporting Bar, Line, Pie, Doughnut, and Table pivot views",
+        "Save custom report templates for instant recurring team access and scheduled email exports"
+      ],
+      impact: "Eliminates reliance on custom SQL queries or developer bandwidth, enabling business analysts to generate custom reports in seconds."
+    };
+  }
+
+  if (key.includes('myob') || key.includes('accounting sync')) {
+    return {
+      overview: "2-Way MYOB EXO Accounting Integration synchronizing invoices, customer ledgers, payment statuses, and tax codes directly between RELcore CRM and MYOB.",
+      capabilities: [
+        "Automated 2-way invoice creation and status sync between RELcore and MYOB",
+        "Customer ledger balance alignment and tax code cross-mapping",
+        "Automated payment reconciliation reducing accounting ledger mismatches",
+        "Error logging and sync history audit trail for financial compliance"
+      ],
+      impact: "Saves finance teams hours of double data entry and ensures 100% accounting ledger accuracy."
+    };
+  }
+
+  if (key.includes('kanban') || key.includes('drag & drop')) {
+    return {
+      overview: "Visual drag-and-drop pipeline interface allowing sales reps to easily advance deals between stages (Qualification, Demo, Proposal, Negotiation, Closed Won). Column totals and conversion metrics update instantly.",
+      capabilities: [
+        "Interactive drag-and-drop card positioning with real-time column value updates",
+        "Automated stage-change triggers (e.g. auto-generate tasks upon moving to 'Proposal')",
+        "Probability weighting & win probability calculation per deal stage",
+        "Custom stage creation with milestone rules and ownership requirements"
+      ],
+      impact: "Accelerates deal closure velocity by up to 35% and gives sales managers 100% real-time visibility into pipeline health."
+    };
+  }
+
+  // Fallback for all other feature tags
+  return {
+    overview: `Detailed capability overview for '${fName}' under the ${subName} submodule of ${modName}. Fully integrated within the RELcore Enterprise OS framework.`,
+    capabilities: [
+      `Automated ${fName} workflow processing with real-time state synchronization`,
+      `Role-based access permission enforcement and activity audit logging`,
+      `Seamless integration with Customer 360° timeline and executive dashboards`,
+      `Customizable parameters, automated alerts, and export options (PDF / Excel / CSV)`
+    ],
+    impact: `Enhances operational efficiency, minimizes manual errors, and provides seamless end-to-end management for ${subName}.`
+  };
+}
+
+function buildDots(total) {
+  const wrap = document.getElementById('navDots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.title = i === 0 ? 'Cover' : i === 1 ? 'Overview' : i === total - 1 ? 'Conclusion' : `Module ${i - 1}`;
+    d.onclick = () => goToSlide(i);
+    wrap.appendChild(d);
+  }
+}
+
+let current = 0;
+let slides = [];
+let total = 0;
+let autoplayTimer = null;
+let isPlaying = false;
+let elapsedSec = 0;
+let timerTick = null;
+
+function goToSlide(n) {
+  if (n < 0 || n >= total) return;
+  slides[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+
+  // Update counter & progress bar
+  document.getElementById('slideCounter').innerText = `${current + 1} / ${total}`;
+  const pct = ((current) / (total - 1)) * 100;
+  document.getElementById('progressBar').style.width = `${pct}%`;
+
+  // Update dots
+  const dots = document.querySelectorAll('.dot');
+  dots.forEach((d, idx) => {
+    if (idx === current) d.classList.add('active');
+    else d.classList.remove('active');
+  });
+}
+
+function toggleAutoplay() {
+  const btn = document.getElementById('autoplayBtn');
+  if (isPlaying) {
+    clearInterval(autoplayTimer);
+    isPlaying = false;
+    btn.classList.remove('active');
+    btn.innerHTML = '&#9654; Auto';
+  } else {
+    isPlaying = true;
+    btn.classList.add('active');
+    btn.innerHTML = '❚❚ Pause';
+    autoplayTimer = setInterval(() => {
+      if (current < total - 1) {
+        goToSlide(current + 1);
+      } else {
+        goToSlide(0);
+      }
+    }, 6000);
+  }
+}
+
+function startTimer() {
+  timerTick = setInterval(() => {
+    elapsedSec++;
+    const m = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+    const s = String(elapsedSec % 60).padStart(2, '0');
+    document.getElementById('timer').innerText = `${m}:${s}`;
+  }, 1000);
+}
+
+// Keyboard Navigation & Touch Swipe
+window.addEventListener('keydown', (e) => {
+  if (document.getElementById('featureModal').classList.contains('active')) return;
+  if (e.key === 'ArrowRight' || e.key === 'Space') {
+    goToSlide(current + 1);
+  } else if (e.key === 'ArrowLeft') {
+    goToSlide(current - 1);
+  } else if (e.key === 'Home') {
+    goToSlide(0);
+  } else if (e.key === 'End') {
+    goToSlide(total - 1);
+  }
+});
+
+let touchStartX = 0;
+window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+window.addEventListener('touchend', e => {
+  if (document.getElementById('featureModal').classList.contains('active')) return;
+  const touchEndX = e.changedTouches[0].screenX;
+  if (touchStartX - touchEndX > 50) goToSlide(current + 1);
+  if (touchEndX - touchStartX > 50) goToSlide(current - 1);
+});
+
+// INITIALIZATION
+window.addEventListener('DOMContentLoaded', () => {
+  buildBg();
+  initParticleCanvas();
+  slides = buildSlides();
+  total = slides.length;
+  buildDots(total);
+  goToSlide(0);
+
+  document.getElementById('prevBtn').onclick = () => goToSlide(current - 1);
+  document.getElementById('nextBtn').onclick = () => goToSlide(current + 1);
+  document.getElementById('autoplayBtn').onclick = toggleAutoplay;
+
+  startTimer();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Development Skills — Modern Workplace &amp; Employability Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --midnight:#070B1E;--deep-slate:#0F172A;--royal:#1E3A8A;--electric:#ea580c;
+            --cyan:#fb923c;--emerald:#10B981;--amber:#F59E0B;
+            --rose:#F43F5E;--purple:#8B5CF6;--neon:#00F0FF;
+            --gold:#FBBF24;--white:#FFFFFF;--plat:#F8FAFC;
+        }
+        html,body{width:100%;height:100%;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif;background:var(--midnight);color:var(--white);overflow:hidden;-webkit-font-smoothing:antialiased}
+        .animated-bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 20% 20%, #0F172A 0%, #070B1E 60%, #020617 100%)}
+        .bg-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.12;animation:drift 30s infinite ease-in-out}
+        @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(110px,-90px) scale(1.2)}66%{transform:translate(-80px,70px) scale(.85)}}
+        .stars{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+        .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite ease-in-out}
+        @keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.9;transform:scale(1.4)}}
+        #particleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+        #slides-container{position:relative;z-index:1;width:100vw;height:100vh;overflow:hidden}
+        .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(1rem,2.5vh,2.5rem) clamp(1rem,3vw,3rem);opacity:0;pointer-events:none;transition:opacity .6s ease,transform .6s cubic-bezier(.4,0,.2,1)}
+        .slide.active{opacity:1;pointer-events:all;transform:translateX(0)!important}
+        .slide.enter-right{transform:translateX(100%)}
+        .slide.enter-left{transform:translateX(-100%)}
+        .slide.exit-left{transform:translateX(-100%);opacity:0}
+        .slide.exit-right{transform:translateX(100%);opacity:0}
+        .controls{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:.85rem;background:rgba(10,14,39,.88);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:.55rem 1.4rem;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+        .ctrl-btn{background:none;border:none;color:var(--white);cursor:pointer;padding:.4rem .8rem;border-radius:8px;font-size:1.05rem;transition:all .2s;opacity:.85;font-weight:600;display:inline-flex;align-items:center;gap:.35rem}
+        .ctrl-btn:hover{opacity:1;background:rgba(255,255,255,.15);transform:scale(1.05)}
+        .slide-counter{font-size:.85rem;color:rgba(255,255,255,.85);font-weight:700;min-width:5.2rem;text-align:center;font-family:'Outfit',sans-serif}
+        .progress-wrap{position:fixed;top:0;left:0;right:0;z-index:100;height:3.5px;background:rgba(255,255,255,.1)}
+        .progress-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--electric));transition:width .4s ease}
+        .timer{font-size:.82rem;color:rgba(255,255,255,.65);font-family:'Outfit',monospace;font-weight:700}
+        .autoplay-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:.38rem .95rem;border-radius:20px;font-size:.78rem;font-weight:700;transition:all .2s}
+        .autoplay-btn:hover{background:rgba(255,255,255,.25)}
+        .autoplay-btn.active{background:linear-gradient(135deg,var(--electric),var(--purple));border-color:transparent;box-shadow:0 0 15px rgba(59,130,246,.5)}
+        .nav-dots{position:fixed;right:1.4rem;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:.4rem}
+        .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s}
+        .dot.active{background:var(--cyan);width:6px;height:18px;border-radius:3px;box-shadow:0 0 8px var(--cyan)}
+        .dot:hover{background:rgba(255,255,255,.8)}
+        
+        /* TITLE SLIDE */
+        .title-slide{text-align:center;width:100%;max-width:1100px}
+        .title-slide .badge{display:inline-flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:.5rem 1.4rem;font-size:.85rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);margin-bottom:1.5rem;backdrop-filter:blur(10px)}
+        .title-slide h1{font-family:'Outfit',sans-serif;font-size:clamp(2.5rem,6.5vw,5.2rem);font-weight:900;line-height:1.05;letter-spacing:-.03em;background:linear-gradient(135deg,#FFFFFF 20%,var(--cyan) 60%,var(--electric) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .title-slide .tagline{font-size:clamp(1.15rem,2.5vw,2rem);color:var(--gold);font-weight:800;margin:.8rem 0 .3rem;letter-spacing:.04em;animation:fadeUp 1s 0.4s both}
+        .title-slide .subtitle{font-size:clamp(.92rem,1.7vw,1.3rem);color:rgba(255,255,255,.75);font-weight:500;animation:fadeUp 1s 0.8s both;max-width:850px;margin:0 auto;line-height:1.6}
+        .title-slide .stats-row{display:flex;gap:clamp(1.2rem,3vw,2.8rem);margin-top:2.2rem;animation:fadeUp 1s 1.2s both;justify-content:center;flex-wrap:wrap}
+        .title-stat{text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:.9rem 1.6rem;border-radius:18px}
+        .title-stat .num{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--electric));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .title-stat .lbl{font-size:.72rem;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem;font-weight:700}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* OVERVIEW MATRIX */
+        .overview-slide{width:100%;max-width:1300px}
+        .slide-header{text-align:center;margin-bottom:1.6rem}
+        .slide-header .eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.2em;color:var(--cyan);font-weight:800;margin-bottom:.4rem}
+        .slide-header h2{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4.2vw,3rem);font-weight:850}
+        .modules-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:.85rem;width:100%}
+        .mod-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:.85rem 1rem;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+        .mod-chip:hover{transform:translateY(-4px);border-color:var(--chip-color,var(--electric));box-shadow:0 10px 30px rgba(0,0,0,.4)}
+        .mod-chip .chip-icon{font-size:1.6rem;margin-bottom:.35rem}
+        .mod-chip .chip-name{font-size:.8rem;font-weight:750;color:rgba(255,255,255,.95)}
+        
+        /* MODULE SLIDES */
+        .module-slide{width:100%;max-width:1300px}
+        .module-slide .mod-header{display:flex;align-items:flex-start;gap:1.6rem;margin-bottom:1.3rem}
+        .mod-icon-wrap{width:70px;height:70px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;position:relative;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.3)}
+        .mod-number{font-size:.75rem;text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.25rem}
+        .mod-title{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;line-height:1.15}
+        .mod-tagline{font-size:clamp(.88rem,1.4vw,1.1rem);color:rgba(255,255,255,.7);margin-top:.25rem;font-weight:500}
+        .mod-description{font-size:clamp(.82rem,1.2vw,.98rem);color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:1.3rem;padding:.85rem 1.3rem;background:rgba(255,255,255,.04);border-left:4px solid;border-radius:0 12px 12px 0}
+        .submodules-grid{display:grid;gap:.85rem}
+        .submodule-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:.9rem 1.1rem;position:relative;overflow:hidden;transition:all .3s}
+        .submodule-card:hover{transform:translateX(6px);border-color:rgba(255,255,255,.3)}
+        .sub-name{font-weight:750;font-size:.9rem;margin-bottom:.45rem;display:flex;align-items:center;gap:.5rem}
+        .funcs-wrap{display:flex;flex-wrap:wrap;gap:.38rem}
+        .func-tag{font-size:.72rem;padding:.25rem .65rem;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.9);font-weight:600}
+        .grid-1{grid-template-columns:1fr}
+        .grid-2{grid-template-columns:repeat(2,1fr)}
+        .grid-3{grid-template-columns:repeat(3,1fr)}
+        @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+        
+        /* CLOSER SLIDE */
+        .closer-slide{text-align:center;width:100%;max-width:1050px}
+        .closer-slide h2{font-family:'Outfit',sans-serif;font-size:clamp(2.2rem,6.5vw,4.6rem);font-weight:900;background:linear-gradient(135deg,var(--white),var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.6rem}
+        .closer-slide .sub{font-size:clamp(.95rem,2vw,1.5rem);color:var(--gold);font-weight:750;margin-bottom:1.5rem}
+        .cta-wrap{display:flex;gap:1.1rem;justify-content:center;flex-wrap:wrap;margin-top:1.8rem}
+        .cta-btn{padding:.8rem 2rem;border-radius:50px;font-weight:750;font-size:.92rem;cursor:pointer;border:none;transition:all .3s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+        .cta-primary{background:linear-gradient(135deg,var(--electric),var(--cyan));color:#fff;box-shadow:0 8px 30px rgba(14,165,233,.4)}
+        .cta-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(14,165,233,.6)}
+        .cta-secondary{background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.2)}
+        .cta-secondary:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+        .closer-modules-list{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;max-width:900px;margin:1.2rem auto}
+        .closer-chip{font-size:.72rem;padding:.3rem .8rem;border-radius:20px;border:1px solid rgba(255,255,255,.15);font-weight:650}
+    </style>
+</head>
+<body>
+<div class="animated-bg" id="animBg"></div>
+<div class="stars" id="starsBg"></div>
+<canvas id="particleCanvas"></canvas>
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<div id="slides-container"></div>
+
+<div class="controls">
+    <button class="ctrl-btn" id="prevBtn" title="Previous Slide">&#9664;</button>
+    <div class="slide-counter" id="slideCounter">1 / 1</div>
+    <button class="ctrl-btn" id="nextBtn" title="Next Slide">&#9654;</button>
+    <button class="autoplay-btn" id="autoplayBtn">&#9654; Auto</button>
+    <div class="timer" id="timer">00:00</div>
+    <a href="/request-demo" class="ctrl-btn" style="color:var(--cyan);text-decoration:none;font-size:.85rem;padding:.3rem .7rem;border:1px solid rgba(6,182,212,.3);border-radius:20px" target="_blank">&#128273; Demo</a>
+</div>
+
+<div class="nav-dots" id="navDots"></div>
+
+<script>
+const MODULES_DATA = [
+    {
+        "name": "Industry Skill Roadmaps",
+        "tagline": "Competency Frameworks for High-Growth Modern Careers",
+        "icon": "🗺️",
+        "color": "#ea580c",
+        "desc": "Step-by-step career path roadmaps for software engineering, product management, data science, digital marketing, finance, and corporate strategy.",
+        "submodules": [
+            {
+                "name": "Career Tracks",
+                "icon": "🚀",
+                "funcs": [
+                    "Full-Stack & Cloud Architecture",
+                    "AI & Data Engineering Track",
+                    "Product & Agile Leadership",
+                    "Corporate Finance & Valuation"
+                ]
+            },
+            {
+                "name": "Milestone Checkpoints",
+                "icon": "🎯",
+                "funcs": [
+                    "Prerequisite Self-Assessments",
+                    "Hands-On Capstone Projects",
+                    "Skill Gap Diagnostics",
+                    "Industry Benchmark Comparison"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "AI Resume & ATS Optimizer",
+        "tagline": "Machine-Readable Resume Builder with Score Analysis",
+        "icon": "📄",
+        "color": "#2563eb",
+        "desc": "Craft recruiters-ready resumes optimized to pass Applicant Tracking Systems (ATS) with impactful action verbs, metrics, and targeted keywords.",
+        "submodules": [
+            {
+                "name": "Resume Builder",
+                "icon": "✍️",
+                "funcs": [
+                    "ATS-Friendly Clean Templates",
+                    "Action Verb & Impact Suggester",
+                    "Job Description Keyword Matcher",
+                    "One-Click Multi-Version Export"
+                ]
+            },
+            {
+                "name": "Portfolio Showcase",
+                "icon": "🌐",
+                "funcs": [
+                    "Personal Web Portfolio Generator",
+                    "GitHub \/ Project Repo Integration",
+                    "Video Pitch & Bio Embedding",
+                    "Custom Domain URL Support"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "AI Mock Interview Simulator",
+        "tagline": "Realistic Technical & Behavioral Video Interview Practice",
+        "icon": "🎙️",
+        "color": "#10B981",
+        "desc": "Practice real-time mock interviews with adaptive AI interrogators providing instant feedback on speech clarity, confidence, body language, and answer structure.",
+        "submodules": [
+            {
+                "name": "Simulation Engine",
+                "icon": "🤖",
+                "funcs": [
+                    "STAR Method Behavioral Drills",
+                    "Live Coding & Technical Whiteboarding",
+                    "Company-Specific Question Sets",
+                    "Case Study Framework Challenges"
+                ]
+            },
+            {
+                "name": "Instant Feedback",
+                "icon": "📊",
+                "funcs": [
+                    "Filler Word & Pacing Analytics",
+                    "Answer Completeness Score",
+                    "Eye Contact & Expression Metric",
+                    "Model High-Scoring Response Guides"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Corporate Communication Mastery",
+        "tagline": "Executive Emailing, Pitching & High-Impact Presentations",
+        "icon": "💬",
+        "color": "#8B5CF6",
+        "desc": "Master the art of concise corporate communication, persuasive stakeholder presentations, cross-cultural business etiquette, and assertive negotiation.",
+        "submodules": [
+            {
+                "name": "Written Communication",
+                "icon": "✉️",
+                "funcs": [
+                    "Executive Summary Writing",
+                    "Crisis Email Formulation",
+                    "Project Status & Escalation Memos",
+                    "Proposal & RFP Drafting"
+                ]
+            },
+            {
+                "name": "Verbal Influence",
+                "icon": "🗣️",
+                "funcs": [
+                    "Pitch Deck Presentation Delivery",
+                    "Handling Tough Q&A Sessions",
+                    "Negotiating Salary & Contracts",
+                    "Active Listening & Empathy"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Agile & Project Management",
+        "tagline": "Scrum, Kanban, Sprint Planning & JIRA Workflows",
+        "icon": "📋",
+        "color": "#F59E0B",
+        "desc": "Gain hands-on mastery in modern Agile project execution, user story estimation, sprint ceremonies, backlog grooming, and risk mitigation.",
+        "submodules": [
+            {
+                "name": "Agile Frameworks",
+                "icon": "🔄",
+                "funcs": [
+                    "Scrum Ceremonies (Daily, Retros)",
+                    "Kanban Board WIP Optimization",
+                    "Sprint Capacity & Velocity Planning",
+                    "User Story & Acceptance Criteria"
+                ]
+            },
+            {
+                "name": "Tools & Workflows",
+                "icon": "⚙️",
+                "funcs": [
+                    "JIRA \/ Trello Project Simulations",
+                    "Risk Register & Blocker Resolution",
+                    "Resource Allocation Matrices",
+                    "Burndown & Gantt Chart Tracking"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "LinkedIn & Professional Brand",
+        "tagline": "Optimizing Digital Footprint, Thought Leadership & Inbound Leads",
+        "icon": "🌐",
+        "color": "#06B6D4",
+        "desc": "Transform your digital presence into a job magnet through strategic LinkedIn optimization, article publishing, networking scripts, and engagement.",
+        "submodules": [
+            {
+                "name": "Profile Optimization",
+                "icon": "⭐",
+                "funcs": [
+                    "High-Impact Headline & Summary",
+                    "Featured Project Highlights",
+                    "Skill Endorsement Strategies",
+                    "Keyword Rich Experience Sections"
+                ]
+            },
+            {
+                "name": "Networking Playbook",
+                "icon": "🤝",
+                "funcs": [
+                    "Cold Inbound Outreach Templates",
+                    "Engaging Industry Leaders",
+                    "Publishing Insights & Case Studies",
+                    "Alumni Network Activation"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Mentorship & 1-on-1 Coaching",
+        "tagline": "Direct Guidance from Top Industry Executives & Alumni",
+        "icon": "👥",
+        "color": "#EC4899",
+        "desc": "Connect with seasoned industry mentors across Silicon Valley and Indian tech hubs for portfolio reviews, career guidance, and referral opportunities.",
+        "submodules": [
+            {
+                "name": "Mentor Matchmaker",
+                "icon": "🔍",
+                "funcs": [
+                    "Algorithm-Based Mentor Pairing",
+                    "1-on-1 Video Advisory Sessions",
+                    "Code & Architecture Review",
+                    "Career Pivot Guidance"
+                ]
+            },
+            {
+                "name": "Action Goals",
+                "icon": "🎯",
+                "funcs": [
+                    "Mentorship Milestones Roadmap",
+                    "Weekly Homework & Readings",
+                    "Goal Accountability Check-ins",
+                    "Direct Referral Fast-Track"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Placement & Job Matcher",
+        "tagline": "Curated Corporate Openings, Hiring Drives & Skill Badges",
+        "icon": "💼",
+        "color": "#14B8A6",
+        "desc": "Direct bridge to 500+ hiring partners with verified skill credential badges, express application pipelines, and salary benchmark intelligence.",
+        "submodules": [
+            {
+                "name": "Hiring Portal",
+                "icon": "🏢",
+                "funcs": [
+                    "Exclusive Partner Job Openings",
+                    "1-Click Profile Application",
+                    "Express Interview Shortlisting",
+                    "Hiring Drive Hackathons"
+                ]
+            },
+            {
+                "name": "Verified Credentials",
+                "icon": "🏅",
+                "funcs": [
+                    "Blockchain-Verified Skill Badges",
+                    "Proctored Assessment Scorecard",
+                    "Salary Negotiation Insights",
+                    "Offer Letter Evaluation Tools"
+                ]
+            }
+        ]
+    }
+];
+const CORE_COUNT = 8;
+const COLORS = ["#06B6D4","#3B82F6","#10B981","#8B5CF6","#F59E0B","#F43F5E","#14B8A6","#A78BFA","#FB923C","#FBBF24","#EC4899","#6366F1","#0EA5E9","#22D3EE","#84CC16"];
+
+function buildBg(){
+  const bg = document.getElementById('animBg');
+  COLORS.forEach((c, i) => {
+    const d = document.createElement('div'); d.className = 'bg-orb';
+    const s = 220 + Math.random() * 380;
+    d.style.cssText = `width:${s}px;height:${s}px;background:${c};left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${i*2}s;animation-duration:${25+i*3}s`;
+    bg.appendChild(d);
+  });
+  const sb = document.getElementById('starsBg');
+  for(let i = 0; i < 110; i++){
+    const st = document.createElement('div'); st.className = 'star';
+    const s = Math.random() * 2.5 + .8;
+    st.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s`;
+    sb.appendChild(st);
+  }
+}
+
+function buildSlides(){
+  const container = document.getElementById('slides-container');
+  const allSlides = [];
+
+  // 1. TITLE SLIDE
+  const t = document.createElement('div');
+  t.className = 'slide active'; t.dataset.index = 0;
+  t.innerHTML = `
+    <div class="title-slide">
+      <div class="badge">&#9889; Complete Enterprise Platform Presentation</div>
+      <h1>Career Development Skills</h1>
+      <div class="tagline">Future-Ready Workplace Mastery &amp; Professional Employability Platform</div>
+      <div class="subtitle">Bridging academia and industry through practical skills, AI resume optimization, simulated corporate interviews, leadership bootcamps, and direct job pathways.</div>
+      <div class="stats-row">
+        
+        <div class="title-stat">
+          <div class="num">95%</div>
+          <div class="lbl">Interview Readiness Score</div>
+        </div>
+        <div class="title-stat">
+          <div class="num">50+</div>
+          <div class="lbl">Corporate Case Studies</div>
+        </div>
+        <div class="title-stat">
+          <div class="num">AI-Driven</div>
+          <div class="lbl">Resume &amp; ATS Optimization</div>
+        </div>
+        <div class="title-stat">
+          <div class="num">Industry</div>
+          <div class="lbl">Verified Skill Credentials</div>
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(t); allSlides.push(t);
+
+  // 2. OVERVIEW MATRIX SLIDE
+  const ov = document.createElement('div');
+  ov.className = 'slide'; ov.dataset.index = 1;
+  ov.innerHTML = `
+    <div class="overview-slide">
+      <div class="slide-header">
+        <div class="eyebrow">Architectural Ecosystem</div>
+        <h2 style="background:linear-gradient(135deg,#fff,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+          ${MODULES_DATA.length} Core Capabilities & Modules
+        </h2>
+        <p style="color:rgba(255,255,255,.6);margin-top:.4rem;font-size:.92rem">Click any module to inspect detailed functional architecture & workflows</p>
+      </div>
+      <div class="modules-grid">
+        ${MODULES_DATA.map((m, i) => `
+          <div class="mod-chip" style="--chip-color:${m.color}" onclick="goToSlide(${i+2})" title="${m.name}">
+            <div class="chip-icon">${m.icon}</div>
+            <div class="chip-name">${m.name}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  container.appendChild(ov); allSlides.push(ov);
+
+  // 3. MODULE DEEP-DIVE SLIDES
+  MODULES_DATA.forEach((m, i) => {
+    const s = document.createElement('div');
+    s.className = 'slide'; s.dataset.index = i + 2;
+    const numCols = m.submodules.length <= 2 ? 'grid-1' : (m.submodules.length <= 4 ? 'grid-2' : 'grid-3');
+
+    s.innerHTML = `
+      <div class="module-slide" style="position:relative;width:100%">
+        <div class="mod-header">
+          <div class="mod-icon-wrap" style="background:linear-gradient(135deg,${m.color},${m.color}99)">
+            <span style="font-size:2.2rem">${m.icon}</span>
+          </div>
+          <div class="mod-title-block">
+            <div class="mod-number" style="color:${m.color}">MODULE ${String(i+1).padStart(2,'0')} / ${MODULES_DATA.length}</div>
+            <div class="mod-title" style="background:linear-gradient(135deg,#fff,${m.color});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${m.name}</div>
+            <div class="mod-tagline">${m.tagline}</div>
+          </div>
+        </div>
+        <div class="mod-description" style="border-color:${m.color}">${m.desc}</div>
+        <div class="submodules-grid ${numCols}">
+          ${m.submodules.map((sub, si) => `
+            <div class="submodule-card">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;background:${m.color}"></div>
+              <div class="sub-name" style="color:${m.color}">
+                <span>${sub.icon||'▸'}</span> ${sub.name}
+              </div>
+              <div class="funcs-wrap">
+                ${sub.funcs.map(f => `<span class="func-tag" style="border-color:${m.color}44;color:rgba(255,255,255,.9)">${f}</span>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    container.appendChild(s); allSlides.push(s);
+  });
+
+  // 4. CLOSING SLIDE
+  const cl = document.createElement('div');
+  cl.className = 'slide'; cl.dataset.index = MODULES_DATA.length + 2;
+  cl.innerHTML = `
+    <div class="closer-slide">
+      <div style="font-size:.85rem;text-transform:uppercase;letter-spacing:.2em;color:var(--cyan);font-weight:800;margin-bottom:.6rem">Enterprise Ready</div>
+      <h2>Ready to Deploy Career Development Skills?</h2>
+      <div class="sub">Future-Ready Workplace Mastery &amp; Professional Employability Platform — High Performance & Scale</div>
+      <div class="closer-modules-list">
+        ${MODULES_DATA.map(m => `<span class="closer-chip" style="border-color:${m.color}66;color:${m.color}">${m.icon} ${m.name}</span>`).join('')}
+      </div>
+      <div class="cta-wrap">
+        <button class="cta-btn cta-secondary" onclick="goToSlide(0)">&#8592; Back to Start</button>
+        <button class="cta-btn cta-secondary" onclick="goToSlide(1)">View All Modules</button>
+        <a href="/request-demo" class="cta-btn cta-primary" target="_blank">&#128273; Request Instant Demo</a>
+      </div>
+      <div style="margin-top:1.8rem;color:rgba(255,255,255,.45);font-size:.85rem">
+        ${MODULES_DATA.length} Modules &nbsp;&bull;&nbsp; 64+ Capabilities &nbsp;&bull;&nbsp; 99.9% SLA &nbsp;&bull;&nbsp; <span style="color:var(--cyan)">Career Development Skills</span>
+      </div>
+    </div>`;
+  container.appendChild(cl); allSlides.push(cl);
+
+  return allSlides;
+}
+
+function buildDots(total){
+  const wrap = document.getElementById('navDots');
+  wrap.innerHTML = '';
+  for(let i = 0; i < total; i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.dataset.i = i;
+    d.title = i === 0 ? 'Title' : (i === 1 ? 'Overview' : (i === total - 1 ? 'Finish' : `Module ${i-1}`));
+    d.onclick = () => goToSlide(i);
+    wrap.appendChild(d);
+  }
+}
+
+let current = 0, total = 0, slides = [], isPlaying = false, autoplayTimer = null, elapsedSec = 0, timerTick = null;
+
+function goToSlide(target, dir){
+  if(target === current || target < 0 || target >= total) return;
+  const prev = slides[current];
+  const curr = slides[target];
+  const direction = dir !== undefined ? dir : (target > current ? 1 : -1);
+  current = target;
+  prev.style.transition = 'opacity .45s ease, transform .45s cubic-bezier(.4,0,.2,1)';
+  prev.style.opacity = '0';
+  prev.style.transform = direction > 0 ? 'translateX(-80px)' : 'translateX(80px)';
+  curr.style.transition = 'none';
+  curr.style.opacity = '0';
+  curr.style.transform = direction > 0 ? 'translateX(80px)' : 'translateX(-80px)';
+  requestAnimationFrame(() => {
+    curr.style.transition = 'opacity .5s ease, transform .5s cubic-bezier(.4,0,.2,1)';
+    curr.style.opacity = '1';
+    curr.style.transform = 'translateX(0)';
+  });
+  document.getElementById('slideCounter').textContent = `${current+1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((current+1)/total)*100}%`;
+  document.querySelectorAll('.dot').forEach(d => { d.classList.toggle('active', +d.dataset.i === current); });
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  curr.classList.add('active');
+}
+
+function next(){ goToSlide((current+1)%total, 1); }
+function prev(){ goToSlide((current-1+total)%total, -1); }
+
+function toggleAutoplay(){
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('autoplayBtn');
+  if(isPlaying){
+    btn.textContent = '⏸ Pause'; btn.classList.add('active');
+    autoplayTimer = setInterval(() => goToSlide((current+1)%total, 1), 5000);
+  } else {
+    btn.textContent = '▶ Auto'; btn.classList.remove('active');
+    clearInterval(autoplayTimer);
+  }
+}
+
+function startTimer(){
+  if(timerTick) clearInterval(timerTick);
+  timerTick = setInterval(() => {
+    elapsedSec++;
+    const m = Math.floor(elapsedSec / 60), s = elapsedSec % 60;
+    document.getElementById('timer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+  if(e.key === ' '){ e.preventDefault(); toggleAutoplay(); }
+  if(e.key === 'f' || e.key === 'F'){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen().catch(()=>{});
+  }
+});
+
+let touchX = 0;
+document.addEventListener('touchstart', e => touchX = e.changedTouches[0].clientX);
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+});
+
+buildBg();
+slides = buildSlides();
+total = slides.length;
+buildDots(total);
+document.getElementById('slideCounter').textContent = `1 / ${total}`;
+document.getElementById('progressBar').style.width = `${(1/total)*100}%`;
+document.getElementById('nextBtn').onclick = next;
+document.getElementById('prevBtn').onclick = prev;
+document.getElementById('autoplayBtn').onclick = toggleAutoplay;
+startTimer();
+
+// PARTICLES
+(function(){
+  const c = document.getElementById('particleCanvas');
+  const ctx = c.getContext('2d');
+  const particles = [];
+  const cols = ['#06B6D4','#3B82F6','#10B981','#8B5CF6','#FBBF24','#F43F5E','#00F0FF'];
+  function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  for(let i = 0; i < 75; i++){
+    particles.push({
+      x: Math.random() * c.width, y: Math.random() * c.height,
+      r: Math.random() * 2 + .5, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3,
+      col: cols[Math.floor(Math.random() * cols.length)],
+      op: Math.random() * .4 + .1
+    });
+  }
+  function draw(){
+    ctx.clearRect(0, 0, c.width, c.height);
+    particles.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.col; ctx.globalAlpha = p.op; ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = c.width; if(p.x > c.width) p.x = 0;
+      if(p.y < 0) p.y = c.height; if(p.y > c.height) p.y = 0;
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=../WEBcore-presentation.html">
+    <title>WEBcore Presentation Redirect</title>
+    <script>window.location.href = "../WEBcore-presentation.html";</script>
+</head>
+<body>
+    <p>Redirecting to <a href="../WEBcore-presentation.html">WEBcore Presentation</a>...</p>
+</body>
+</html>
