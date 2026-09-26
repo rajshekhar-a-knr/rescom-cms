@@ -5,12 +5,12 @@
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
         <h1 class="page-title" style="margin:0 0 4px 0">Header Settings & Navigation</h1>
-        <p style="margin:0;font-size:13px;color:var(--text-muted)">Manage the main navigation tabs, dropdowns, header buttons, and active status.</p>
+        <p style="margin:0;font-size:13px;color:var(--text-muted)">Manage the main navigation tabs, dropdowns, sub-menus, header buttons, and active status.</p>
     </div>
     <div style="display:flex;gap:10px">
-        <form action="{{ route('admin.settings.menu-items.reset', 'header') }}" method="POST" onsubmit="return confirm('Reset header navigation to standard defaults?');">
+        <form action="{{ route('admin.settings.menu-items.reset', 'header') }}" method="POST" onsubmit="return confirm('Reset header navigation and submenus to standard defaults?');">
             @csrf
-            <button type="submit" class="btn btn-secondary btn-sm" title="Restore standard default navigation tabs">
+            <button type="submit" class="btn btn-secondary btn-sm" title="Restore standard default navigation tabs and sub-menus">
                 <i class="fas fa-undo"></i> Reset to Defaults
             </button>
         </form>
@@ -49,17 +49,28 @@
         }
         return old($key, $settings[$key]->value ?? $default);
     };
+
+    $totalTabsCount = $menuItems->count();
+    $totalSubCount = 0;
+    $activeCount = 0;
+    foreach($menuItems as $m) {
+        if ($m->is_active) $activeCount++;
+        foreach($m->children as $c) {
+            $totalSubCount++;
+            if ($c->is_active) $activeCount++;
+        }
+    }
 @endphp
 
-<!-- 1. Header Navigation Tabs Table (Full CRUD) -->
+<!-- 1. Header Navigation Tabs & Submenus Table (Full CRUD) -->
 <div class="card" style="margin-bottom:24px;border-radius:14px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.03)">
     <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px">
         <div>
-            <h3 class="card-title" style="margin:0 0 4px 0;font-size:16px">Navigation Tabs & Links</h3>
-            <p style="margin:0;font-size:12px;color:var(--text-muted)">Toggle Active / Inactive to show or hide tabs on both desktop navbar and mobile menu in real-time.</p>
+            <h3 class="card-title" style="margin:0 0 4px 0;font-size:16px">Navigation Tabs & Sub-Menus</h3>
+            <p style="margin:0;font-size:12px;color:var(--text-muted)">Manage top-level header tabs and their child sub-menus (e.g. Resources dropdown items). Toggle Active / Inactive to show or hide in real-time.</p>
         </div>
         <span class="badge" style="background:rgba(15,76,129,0.1);color:var(--primary);padding:6px 12px;border-radius:999px;font-weight:700;font-size:12px">
-            {{ $menuItems->count() }} Total Tabs ({{ $menuItems->where('is_active', 1)->count() }} Active)
+            {{ $totalTabsCount }} Tabs & {{ $totalSubCount }} Submenus ({{ $activeCount }} Active)
         </span>
     </div>
     <div class="card-body" style="padding:0">
@@ -68,24 +79,30 @@
                 <thead>
                     <tr style="background:#f8fafc;border-bottom:1px solid var(--border);text-align:left">
                         <th style="padding:12px 16px;width:70px;font-size:12px;font-weight:700;color:#64748b">Order</th>
-                        <th style="padding:12px 16px;font-size:12px;font-weight:700;color:#64748b">Tab Title</th>
+                        <th style="padding:12px 16px;font-size:12px;font-weight:700;color:#64748b">Menu / Submenu Title</th>
                         <th style="padding:12px 16px;font-size:12px;font-weight:700;color:#64748b">Type & Destination</th>
                         <th style="padding:12px 16px;width:100px;font-size:12px;font-weight:700;color:#64748b">Badge</th>
                         <th style="padding:12px 16px;width:110px;font-size:12px;font-weight:700;color:#64748b">Target</th>
                         <th style="padding:12px 16px;width:130px;font-size:12px;font-weight:700;color:#64748b;text-align:center">Active Status</th>
-                        <th style="padding:12px 16px;width:120px;font-size:12px;font-weight:700;color:#64748b;text-align:right">Actions</th>
+                        <th style="padding:12px 16px;width:180px;font-size:12px;font-weight:700;color:#64748b;text-align:right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="headerItemsTableBody">
                     @forelse($menuItems as $item)
-                    <tr style="border-bottom:1px solid #f1f5f9;transition:background 0.15s" id="row-item-{{ $item->id }}">
+                    <!-- Top-Level Tab Row -->
+                    <tr style="border-bottom:1px solid #f1f5f9;background:#ffffff;transition:background 0.15s" id="row-item-{{ $item->id }}">
                         <td style="padding:14px 16px;font-weight:700;color:#64748b;font-size:13px">
                             <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#f1f5f9;border-radius:6px;font-weight:800">{{ $item->sort_order }}</span>
                         </td>
-                        <td style="padding:14px 16px;font-weight:700;font-size:14px;color:#1e293b">
+                        <td style="padding:14px 16px;font-weight:750;font-size:14px;color:#0f172a">
                             <div style="display:flex;align-items:center;gap:8px">
-                                @if($item->icon) <i class="{{ $item->icon }}" style="color:#0284c7"></i> @endif
-                                <span>{{ $item->title }}</span>
+                                @if($item->icon) <i class="{{ $item->icon }}" style="color:#0284c7;font-size:15px"></i> @endif
+                                <span style="font-size:14.5px">{{ $item->title }}</span>
+                                @if($item->children && $item->children->count() > 0)
+                                    <span style="font-size:10.5px;padding:2px 7px;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:800">
+                                        {{ $item->children->count() }} sub-items
+                                    </span>
+                                @endif
                             </div>
                         </td>
                         <td style="padding:14px 16px;font-size:13px">
@@ -99,7 +116,7 @@
                                 </span>
                             @elseif($item->item_type === 'dropdown_resources')
                                 <span style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:6px;font-weight:700;font-size:11px">
-                                    <i class="fas fa-folder-open"></i> Resources Dropdown
+                                    <i class="fas fa-folder-open"></i> Resources Dropdown (Sub-menus below)
                                 </span>
                             @elseif($item->item_type === 'presentation')
                                 <span style="display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;color:#047857;padding:3px 8px;border-radius:6px;font-weight:700;font-size:11px">
@@ -107,7 +124,7 @@
                                 </span>
                             @else
                                 <span style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#475569;padding:3px 8px;border-radius:6px;font-weight:600;font-size:11px">
-                                    <i class="fas fa-link"></i> Link
+                                    <i class="fas fa-link"></i> Tab Link
                                 </span>
                             @endif
                             <div style="font-family:monospace;font-size:11.5px;color:#64748b;margin-top:3px">{{ $item->url ?: '#' }}</div>
@@ -135,10 +152,13 @@
                             </button>
                         </td>
                         <td style="padding:14px 16px;text-align:right;white-space:nowrap">
+                            <button type="button" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:11px;color:#0369a1;background:#e0f2fe;border-color:#bae6fd" onclick="openAddSubmenuModal({{ $item->id }}, '{{ addslashes($item->title) }}')" title="Add Submenu Item under this tab">
+                                <i class="fas fa-plus"></i> Submenu
+                            </button>
                             <button type="button" class="btn btn-sm btn-secondary" style="padding:5px 9px" onclick='openEditHeaderModal(@json($item))' title="Edit Tab">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form action="{{ route('admin.settings.menu-items.destroy', $item) }}" method="POST" style="display:inline-block;margin:0" onsubmit="return confirm('Delete tab \'{{ $item->title }}\'?');">
+                            <form action="{{ route('admin.settings.menu-items.destroy', $item) }}" method="POST" style="display:inline-block;margin:0" onsubmit="return confirm('Delete tab \'{{ $item->title }}\' and any sub-menus?');">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" style="padding:5px 9px;background:#ef4444;color:white;border:none;border-radius:6px" title="Delete Tab">
                                     <i class="fas fa-trash-alt"></i>
@@ -146,6 +166,65 @@
                             </form>
                         </td>
                     </tr>
+
+                    <!-- Child Sub-Menus Rows -->
+                    @if($item->children && $item->children->count() > 0)
+                        @foreach($item->children as $child)
+                        <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;transition:background 0.15s" id="row-item-{{ $child->id }}">
+                            <td style="padding:10px 16px 10px 28px;font-weight:600;color:#94a3b8;font-size:12px">
+                                <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#e2e8f0;border-radius:4px;font-size:11px;font-weight:700">{{ $child->sort_order }}</span>
+                            </td>
+                            <td style="padding:10px 16px 10px 32px;font-size:13.5px;color:#334155">
+                                <div style="display:flex;align-items:center;gap:8px">
+                                    <span style="color:#94a3b8;font-size:13px">↳</span>
+                                    <span style="font-size:10px;font-weight:800;background:#f1f5f9;border:1px solid #cbd5e1;color:#475569;padding:1px 6px;border-radius:4px">SUBMENU</span>
+                                    @if($child->icon) <i class="{{ $child->icon }}" style="color:#64748b;font-size:13px"></i> @endif
+                                    <span style="font-weight:650">{{ $child->title }}</span>
+                                </div>
+                            </td>
+                            <td style="padding:10px 16px;font-size:12.5px">
+                                <span style="display:inline-flex;align-items:center;gap:4px;background:#ffffff;border:1px solid #e2e8f0;color:#475569;padding:2px 7px;border-radius:5px;font-weight:600;font-size:11px">
+                                    <i class="fas fa-arrow-right" style="color:#0284c7;font-size:10px"></i> Submenu Link
+                                </span>
+                                <div style="font-family:monospace;font-size:11px;color:#64748b;margin-top:2px">{{ $child->url ?: '#' }}</div>
+                            </td>
+                            <td style="padding:10px 16px;font-size:11px">
+                                @if($child->badge_text)
+                                    <span style="background:var(--accent);color:white;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800">{{ $child->badge_text }}</span>
+                                @else
+                                    <span style="color:#cbd5e1">—</span>
+                                @endif
+                            </td>
+                            <td style="padding:10px 16px;font-size:11px;color:#64748b">
+                                <code>{{ $child->target }}</code>
+                            </td>
+                            <td style="padding:10px 16px;text-align:center">
+                                <button type="button" 
+                                        class="toggle-badge-btn {{ $child->is_active ? 'active' : 'inactive' }}" 
+                                        onclick="toggleItemStatus({{ $child->id }}, this)"
+                                        title="Click to toggle Active / Inactive"
+                                        style="border:none;background:none;cursor:pointer;padding:0">
+                                    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;transition:all 0.2s;{{ $child->is_active ? 'background:#dcfce7;color:#15803d;border:1px solid #bbf7d0' : 'background:#fee2e2;color:#b91c1c;border:1px solid #fecaca' }}">
+                                        <span style="width:6px;height:6px;border-radius:50%;background:{{ $child->is_active ? '#22c55e' : '#ef4444' }}"></span>
+                                        <span>{{ $child->is_active ? 'Active' : 'Inactive' }}</span>
+                                    </span>
+                                </button>
+                            </td>
+                            <td style="padding:10px 16px;text-align:right;white-space:nowrap">
+                                <button type="button" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:12px" onclick='openEditHeaderModal(@json($child))' title="Edit Submenu">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ route('admin.settings.menu-items.destroy', $child) }}" method="POST" style="display:inline-block;margin:0" onsubmit="return confirm('Delete sub-menu \'{{ $child->title }}\'?');">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:6px;font-size:12px" title="Delete Submenu">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    @endif
+
                     @empty
                     <tr>
                         <td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">
@@ -256,11 +335,11 @@
     </div>
 </form>
 
-<!-- Modal: Add Header Item -->
+<!-- Modal: Add Header Item / Submenu Item -->
 <div id="addHeaderModal" class="custom-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
     <div style="background:white;width:100%;max-width:540px;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;animation:modalIn 0.2s ease">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #e2e8f0;background:#f8fafc">
-            <h3 style="margin:0;font-size:16px;font-weight:800;color:#0f172a"><i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px"></i> Add Header Tab</h3>
+            <h3 id="addModalHeaderTitle" style="margin:0;font-size:16px;font-weight:800;color:#0f172a"><i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px"></i> Add Header Tab or Submenu</h3>
             <button type="button" onclick="closeAddHeaderModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;cursor:pointer">&times;</button>
         </div>
         <form action="{{ route('admin.settings.menu-items.store') }}" method="POST" style="padding:24px">
@@ -269,33 +348,51 @@
             <input type="hidden" name="section" value="main">
 
             <div class="form-group" style="margin-bottom:14px">
-                <label class="form-label" style="font-weight:700">Tab Title *</label>
-                <input type="text" name="title" class="form-control" required placeholder="e.g. About, Services, Products, Contact">
+                <label class="form-label" style="font-weight:700">Parent Tab</label>
+                <select name="parent_id" id="addParentId" class="form-control" onchange="handleAddParentChange(this)">
+                    <option value="">None (Top-Level Main Tab)</option>
+                    @foreach($parentMenuItems as $p)
+                        <option value="{{ $p->id }}">{{ $p->title }} (Submenu under {{ $p->title }})</option>
+                    @endforeach
+                </select>
+                <small style="color:#64748b">Select a parent tab (like <strong>Resources</strong>) to add this item as a sub-menu.</small>
             </div>
 
             <div class="form-group" style="margin-bottom:14px">
-                <label class="form-label" style="font-weight:700">Tab Type</label>
-                <select name="item_type" class="form-control" onchange="handleTypeChange(this, 'add')">
-                    <option value="link">Standard Page Link</option>
+                <label class="form-label" style="font-weight:700">Title *</label>
+                <input type="text" name="title" id="addTitle" class="form-control" required placeholder="e.g. Internship, Events, Gallery, Blogs, FAQs">
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px" id="addItemTypeGroup">
+                <label class="form-label" style="font-weight:700">Tab / Menu Type</label>
+                <select name="item_type" id="addItemType" class="form-control" onchange="handleTypeChange(this, 'add')">
+                    <option value="link">Standard Page Link / Submenu</option>
+                    <option value="dropdown_resources">Resources Dropdown (Contains Sub-menus)</option>
                     <option value="dropdown_products">Products Mega-Dropdown (Dynamic)</option>
                     <option value="dropdown_services">Services Mega-Dropdown (Dynamic)</option>
-                    <option value="dropdown_resources">Resources Dropdown (Internship, Events, Blogs, FAQs)</option>
                     <option value="presentation">Corporate Interactive Presentation</option>
                     <option value="custom">Custom URL</option>
                 </select>
             </div>
 
             <div class="form-group" style="margin-bottom:14px" id="addUrlGroup">
-                <label class="form-label" style="font-weight:700">URL / Path</label>
-                <input type="text" name="url" class="form-control" placeholder="e.g. /about or /services or https://example.com">
-                <small style="color:#64748b">Use relative paths (e.g. /about) or full URLs.</small>
+                <label class="form-label" style="font-weight:700">URL / Destination Path *</label>
+                <input type="text" name="url" id="addUrl" class="form-control" placeholder="e.g. /internship, /events, /gallery, /blog, /testimonials, /faqs">
+                <small style="color:#64748b">Use relative routes (e.g. <code>/internship</code>, <code>/events</code>, <code>/blog</code>) or full URLs.</small>
             </div>
 
             <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div class="form-group">
+                    <label class="form-label" style="font-weight:700">FontAwesome Icon</label>
+                    <input type="text" name="icon" id="addIcon" class="form-control" placeholder="e.g. fas fa-graduation-cap">
+                </div>
+                <div class="form-group">
                     <label class="form-label" style="font-weight:700">Badge Text (Optional)</label>
                     <input type="text" name="badge_text" class="form-control" placeholder="e.g. Live, New, Hot">
                 </div>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div class="form-group">
                     <label class="form-label" style="font-weight:700">Open In Target</label>
                     <select name="target" class="form-control">
@@ -303,65 +400,81 @@
                         <option value="_blank">New Tab (_blank)</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
                 <div class="form-group">
                     <label class="form-label" style="font-weight:700">Sort Order</label>
-                    <input type="number" name="sort_order" class="form-control" value="{{ ($menuItems->max('sort_order') ?? 0) + 1 }}">
+                    <input type="number" name="sort_order" id="addSortOrder" class="form-control" value="1">
                 </div>
-                <div class="form-group" style="display:flex;align-items:center;margin-top:28px">
-                    <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:13.5px">
-                        <input type="checkbox" name="is_active" value="1" checked style="width:18px;height:18px">
-                        <span>Active by default</span>
-                    </label>
-                </div>
+            </div>
+
+            <div class="form-group" style="display:flex;align-items:center;margin-bottom:18px">
+                <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:13.5px">
+                    <input type="checkbox" name="is_active" value="1" checked style="width:18px;height:18px">
+                    <span>Active by default (shown on frontend)</span>
+                </label>
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #e2e8f0;padding-top:16px">
                 <button type="button" class="btn btn-secondary" onclick="closeAddHeaderModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Add Tab</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Save Item</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal: Edit Header Item -->
+<!-- Modal: Edit Header Item / Submenu Item -->
 <div id="editHeaderModal" class="custom-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
     <div style="background:white;width:100%;max-width:540px;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;animation:modalIn 0.2s ease">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #e2e8f0;background:#f8fafc">
-            <h3 style="margin:0;font-size:16px;font-weight:800;color:#0f172a"><i class="fas fa-edit" style="color:var(--primary);margin-right:8px"></i> Edit Header Tab</h3>
+            <h3 id="editModalHeaderTitle" style="margin:0;font-size:16px;font-weight:800;color:#0f172a"><i class="fas fa-edit" style="color:var(--primary);margin-right:8px"></i> Edit Menu Item</h3>
             <button type="button" onclick="closeEditHeaderModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;cursor:pointer">&times;</button>
         </div>
         <form id="editHeaderForm" method="POST" style="padding:24px">
             @csrf @method('PUT')
+            
             <div class="form-group" style="margin-bottom:14px">
-                <label class="form-label" style="font-weight:700">Tab Title *</label>
+                <label class="form-label" style="font-weight:700">Parent Tab</label>
+                <select name="parent_id" id="editParentId" class="form-control">
+                    <option value="">None (Top-Level Main Tab)</option>
+                    @foreach($parentMenuItems as $p)
+                        <option value="{{ $p->id }}">{{ $p->title }} (Submenu under {{ $p->title }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label" style="font-weight:700">Title *</label>
                 <input type="text" id="editTitle" name="title" class="form-control" required>
             </div>
 
             <div class="form-group" style="margin-bottom:14px">
-                <label class="form-label" style="font-weight:700">Tab Type</label>
+                <label class="form-label" style="font-weight:700">Tab / Menu Type</label>
                 <select id="editItemType" name="item_type" class="form-control" onchange="handleTypeChange(this, 'edit')">
-                    <option value="link">Standard Page Link</option>
+                    <option value="link">Standard Page Link / Submenu</option>
+                    <option value="dropdown_resources">Resources Dropdown (Contains Sub-menus)</option>
                     <option value="dropdown_products">Products Mega-Dropdown (Dynamic)</option>
                     <option value="dropdown_services">Services Mega-Dropdown (Dynamic)</option>
-                    <option value="dropdown_resources">Resources Dropdown (Internship, Events, Blogs, FAQs)</option>
                     <option value="presentation">Corporate Interactive Presentation</option>
                     <option value="custom">Custom URL</option>
                 </select>
             </div>
 
             <div class="form-group" style="margin-bottom:14px" id="editUrlGroup">
-                <label class="form-label" style="font-weight:700">URL / Path</label>
+                <label class="form-label" style="font-weight:700">URL / Destination Path</label>
                 <input type="text" id="editUrl" name="url" class="form-control">
             </div>
 
             <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div class="form-group">
+                    <label class="form-label" style="font-weight:700">FontAwesome Icon</label>
+                    <input type="text" id="editIcon" name="icon" class="form-control" placeholder="e.g. fas fa-graduation-cap">
+                </div>
+                <div class="form-group">
                     <label class="form-label" style="font-weight:700">Badge Text (Optional)</label>
                     <input type="text" id="editBadgeText" name="badge_text" class="form-control">
                 </div>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div class="form-group">
                     <label class="form-label" style="font-weight:700">Open In Target</label>
                     <select id="editTarget" name="target" class="form-control">
@@ -369,24 +482,22 @@
                         <option value="_blank">New Tab (_blank)</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
                 <div class="form-group">
                     <label class="form-label" style="font-weight:700">Sort Order</label>
                     <input type="number" id="editSortOrder" name="sort_order" class="form-control">
                 </div>
-                <div class="form-group" style="display:flex;align-items:center;margin-top:28px">
-                    <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:13.5px">
-                        <input type="checkbox" id="editIsActive" name="is_active" value="1" style="width:18px;height:18px">
-                        <span>Active</span>
-                    </label>
-                </div>
+            </div>
+
+            <div class="form-group" style="display:flex;align-items:center;margin-bottom:18px">
+                <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:13.5px">
+                    <input type="checkbox" id="editIsActive" name="is_active" value="1" style="width:18px;height:18px">
+                    <span>Active (Visible on frontend)</span>
+                </label>
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #e2e8f0;padding-top:16px">
                 <button type="button" class="btn btn-secondary" onclick="closeEditHeaderModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Tab</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Item</button>
             </div>
         </form>
     </div>
@@ -401,16 +512,42 @@
 
 <script>
 function openAddHeaderModal() {
+    document.getElementById('addModalHeaderTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px"></i> Add Header Tab';
+    document.getElementById('addParentId').value = '';
+    document.getElementById('addTitle').value = '';
+    document.getElementById('addUrl').value = '';
+    document.getElementById('addIcon').value = '';
+    document.getElementById('addItemType').value = 'link';
+    document.getElementById('addSortOrder').value = '{{ ($menuItems->max("sort_order") ?? 0) + 1 }}';
     document.getElementById('addHeaderModal').style.display = 'flex';
 }
+
+function openAddSubmenuModal(parentId, parentTitle) {
+    document.getElementById('addModalHeaderTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px"></i> Add Submenu under "' + parentTitle + '"';
+    document.getElementById('addParentId').value = parentId;
+    document.getElementById('addTitle').value = '';
+    document.getElementById('addUrl').value = '';
+    document.getElementById('addIcon').value = '';
+    document.getElementById('addItemType').value = 'link';
+    document.getElementById('addSortOrder').value = '1';
+    document.getElementById('addHeaderModal').style.display = 'flex';
+}
+
 function closeAddHeaderModal() {
     document.getElementById('addHeaderModal').style.display = 'none';
 }
+
 function openEditHeaderModal(item) {
     document.getElementById('editHeaderForm').action = "{{ url('admin/settings/menu-items') }}/" + item.id;
+    document.getElementById('editModalHeaderTitle').innerHTML = item.parent_id 
+        ? '<i class="fas fa-edit" style="color:var(--primary);margin-right:8px"></i> Edit Submenu Item' 
+        : '<i class="fas fa-edit" style="color:var(--primary);margin-right:8px"></i> Edit Header Tab';
+
+    document.getElementById('editParentId').value = item.parent_id || '';
     document.getElementById('editTitle').value = item.title || '';
     document.getElementById('editItemType').value = item.item_type || 'link';
     document.getElementById('editUrl').value = item.url || '';
+    document.getElementById('editIcon').value = item.icon || '';
     document.getElementById('editBadgeText').value = item.badge_text || '';
     document.getElementById('editTarget').value = item.target || '_self';
     document.getElementById('editSortOrder').value = item.sort_order || 0;
@@ -418,13 +555,20 @@ function openEditHeaderModal(item) {
 
     document.getElementById('editHeaderModal').style.display = 'flex';
 }
+
 function closeEditHeaderModal() {
     document.getElementById('editHeaderModal').style.display = 'none';
 }
 
+function handleAddParentChange(select) {
+    if (select.value) {
+        document.getElementById('addItemType').value = 'link';
+    }
+}
+
 function handleTypeChange(select, prefix) {
     const val = select.value;
-    const urlInput = prefix === 'add' ? document.querySelector('#addUrlGroup input') : document.getElementById('editUrl');
+    const urlInput = prefix === 'add' ? document.getElementById('addUrl') : document.getElementById('editUrl');
     if (val === 'dropdown_products') {
         if (!urlInput.value || urlInput.value === '#') urlInput.value = '/portfolio';
     } else if (val === 'dropdown_services') {

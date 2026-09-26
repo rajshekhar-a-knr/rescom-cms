@@ -34,8 +34,17 @@ class SettingsController extends Controller
     {
         $settings = Setting::where('group', 'header')->get()->keyBy('key');
         $headerMenu = Menu::firstOrCreate(['location' => 'header'], ['name' => 'Main Navigation', 'is_active' => 1]);
-        $menuItems = MenuItem::where('menu_id', $headerMenu->id)->orderBy('sort_order')->orderBy('id')->get();
-        return view('admin.pages.settings.header', compact('settings', 'headerMenu', 'menuItems'));
+        $menuItems = MenuItem::with(['children' => fn($q) => $q->orderBy('sort_order')->orderBy('id')])
+            ->where('menu_id', $headerMenu->id)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+        $parentMenuItems = MenuItem::where('menu_id', $headerMenu->id)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+        return view('admin.pages.settings.header', compact('settings', 'headerMenu', 'menuItems', 'parentMenuItems'));
     }
 
     public function footer()
@@ -74,6 +83,7 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'menu_id' => 'required|exists:menus,id',
+            'parent_id' => 'nullable|exists:menu_items,id',
             'title' => 'required|string|max:255',
             'url' => 'nullable|string|max:500',
             'target' => 'nullable|string|in:_self,_blank',
@@ -85,6 +95,7 @@ class SettingsController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
+        $validated['parent_id'] = !empty($validated['parent_id']) ? $validated['parent_id'] : null;
         $validated['target'] = $validated['target'] ?? '_self';
         $validated['item_type'] = $validated['item_type'] ?? 'link';
         $validated['section'] = $validated['section'] ?? 'main';
@@ -92,7 +103,8 @@ class SettingsController extends Controller
 
         if (!isset($validated['sort_order']) || $validated['sort_order'] === null) {
             $maxSort = MenuItem::where('menu_id', $validated['menu_id'])
-                ->when(isset($validated['section']), fn($q) => $q->where('section', $validated['section']))
+                ->when($validated['parent_id'], fn($q) => $q->where('parent_id', $validated['parent_id']))
+                ->when(!$validated['parent_id'] && isset($validated['section']), fn($q) => $q->where('section', $validated['section'])->whereNull('parent_id'))
                 ->max('sort_order') ?? 0;
             $validated['sort_order'] = $maxSort + 1;
         }
@@ -109,6 +121,7 @@ class SettingsController extends Controller
     public function updateMenuItem(Request $request, MenuItem $menuItem)
     {
         $validated = $request->validate([
+            'parent_id' => 'nullable|exists:menu_items,id',
             'title' => 'required|string|max:255',
             'url' => 'nullable|string|max:500',
             'target' => 'nullable|string|in:_self,_blank',
@@ -120,6 +133,9 @@ class SettingsController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
+        if ($request->has('parent_id')) {
+            $validated['parent_id'] = !empty($validated['parent_id']) ? $validated['parent_id'] : null;
+        }
         $validated['target'] = $validated['target'] ?? '_self';
         $validated['item_type'] = $validated['item_type'] ?? ($menuItem->item_type ?? 'link');
         $validated['section'] = $validated['section'] ?? ($menuItem->section ?? 'main');
@@ -139,6 +155,8 @@ class SettingsController extends Controller
     public function destroyMenuItem(MenuItem $menuItem)
     {
         $title = $menuItem->title;
+        // Also delete children if parent is deleted
+        MenuItem::where('parent_id', $menuItem->id)->delete();
         $menuItem->delete();
 
         if (request()->wantsJson() || request()->ajax()) {
@@ -193,7 +211,26 @@ class SettingsController extends Controller
                 ['title' => 'Presentation', 'url' => '/presentations/rescom-presentation', 'item_type' => 'presentation', 'target' => '_blank', 'badge_text' => 'Live', 'sort_order' => 7, 'is_active' => 1],
             ];
             foreach ($defaultHeaderTabs as $item) {
-                MenuItem::create(array_merge($item, ['menu_id' => $menu->id, 'section' => 'main']));
+                $created = MenuItem::create(array_merge($item, ['menu_id' => $menu->id, 'section' => 'main']));
+                if ($created->title === 'Resources') {
+                    $resourcesSub = [
+                        ['title' => 'Internship', 'url' => '/internship', 'sort_order' => 1, 'is_active' => 1],
+                        ['title' => 'Events', 'url' => '/events', 'sort_order' => 2, 'is_active' => 1],
+                        ['title' => 'Gallery', 'url' => '/gallery', 'sort_order' => 3, 'is_active' => 1],
+                        ['title' => 'Blogs', 'url' => '/blog', 'sort_order' => 4, 'is_active' => 1],
+                        ['title' => 'Testimonials', 'url' => '/testimonials', 'sort_order' => 5, 'is_active' => 1],
+                        ['title' => 'FAQs', 'url' => '/faqs', 'sort_order' => 6, 'is_active' => 1],
+                    ];
+                    foreach ($resourcesSub as $sub) {
+                        MenuItem::create(array_merge($sub, [
+                            'menu_id' => $menu->id,
+                            'parent_id' => $created->id,
+                            'section' => 'main',
+                            'item_type' => 'link',
+                            'target' => '_self'
+                        ]));
+                    }
+                }
             }
         } elseif ($location === 'footer') {
             $defaultFooterItems = [

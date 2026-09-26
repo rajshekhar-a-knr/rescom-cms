@@ -56,6 +56,50 @@
     <style>
         .field-error { color: #dc2626; font-size: 12px; margin-top: 6px; }
         :root { --header-height: 80px; }
+
+        /* ===== HEADER LOGO & TAGLINE ALIGNMENT ===== */
+        .header .logo {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            margin-right: auto;
+        }
+        .header .logo-stack {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .header .logo-image {
+            width: auto;
+            max-width: 140px;
+            height: 48px;
+            object-fit: contain;
+            background: #ffffff;
+            padding: 5px 12px;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+            display: block;
+        }
+        .header .logo-tagline {
+            font-size: 10px;
+            font-weight: 750;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            line-height: 1.1;
+            white-space: nowrap;
+            text-align: left;
+            display: block;
+            margin: 0;
+            padding-left: 2px;
+        }
+        .header.scrolled .logo-tagline,
+        .home-hero-light .header .logo-tagline,
+        .detail-hero-light .header .logo-tagline {
+            color: #475569 !important;
+        }
+
         .mobile-menu { top: 0; height: 100%; padding-top: var(--header-height); }
         @media (max-width: 768px) { :root { --header-height: 72px; } }
         .mobile-menu {
@@ -490,7 +534,9 @@
             $navPages = collect();
             $headerMenuItems = collect();
             try {
-                $headerMenuItems = \App\Models\MenuItem::where('menu_id', 1)
+                $headerMenuItems = \App\Models\MenuItem::with(['activeChildren' => fn($q) => $q->orderBy('sort_order')->orderBy('id')])
+                    ->where('menu_id', 1)
+                    ->whereNull('parent_id')
                     ->where('is_active', 1)
                     ->orderBy('sort_order')
                     ->orderBy('id')
@@ -601,7 +647,7 @@
                                 </div>
                             </div>
                         </div>
-                    @elseif($item->item_type === 'dropdown_resources')
+                    @elseif($item->item_type === 'dropdown_resources' || ($item->activeChildren && $item->activeChildren->isNotEmpty()))
                         <div class="nav-dropdown nav-dropdown--fit">
                             <a href="javascript:void(0)" 
                                class="nav-link {{ request()->routeIs('gallery') || request()->routeIs('blog*') || request()->routeIs('faqs.page') || request()->routeIs('testimonials') || request()->routeIs('events*') || request()->routeIs('internship*') ? 'active' : '' }}">
@@ -612,34 +658,49 @@
                                 @endif
                             </a>
                             <div class="dropdown-menu">
-                                @php
-                                    $eventsCount = 0;
-                                    $galleryCount = 0;
-                                    $blogsCount = 0;
-                                    $testimonialsCount = 0;
-                                    $faqsCount = 0;
-                                    try {
-                                        $eventsCount = \App\Models\Event::where('is_active',1)->count();
-                                        $galleryCount = \App\Models\GalleryItem::where('is_active',1)->count();
-                                        $blogsCount = \App\Models\BlogPost::where('status','published')->count();
-                                        $testimonialsCount = \App\Models\Testimonial::where('is_active',1)->count();
-                                        $faqsCount = \App\Models\Faq::where('is_active',1)->count();
-                                    } catch (\Throwable $e) {}
+                                @if($item->activeChildren && $item->activeChildren->isNotEmpty())
+                                    @foreach($item->activeChildren as $child)
+                                        @php
+                                            $childUrl = $child->url ? (str_starts_with($child->url, 'http') || str_starts_with($child->url, '/') || str_starts_with($child->url, '#') ? $child->url : url($child->url)) : '#';
+                                        @endphp
+                                        <a href="{{ $childUrl }}" target="{{ $child->target ?: '_self' }}" class="dropdown-item">
+                                            @if($child->icon)<i class="{{ $child->icon }}" style="margin-right:6px;font-size:12px;opacity:0.8"></i>@endif
+                                            <span>{{ $child->title }}</span>
+                                            @if($child->badge_text)
+                                                <span style="font-size:9.5px;padding:1px 6px;border-radius:999px;background:var(--accent);color:white;margin-left:auto;font-weight:700">{{ $child->badge_text }}</span>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                @else
+                                    @php
+                                        $eventsCount = 0;
+                                        $galleryCount = 0;
+                                        $blogsCount = 0;
+                                        $testimonialsCount = 0;
+                                        $faqsCount = 0;
+                                        try {
+                                            $eventsCount = \App\Models\Event::where('is_active',1)->count();
+                                            $galleryCount = \App\Models\GalleryItem::where('is_active',1)->count();
+                                            $blogsCount = \App\Models\BlogPost::where('status','published')->count();
+                                            $testimonialsCount = \App\Models\Testimonial::where('is_active',1)->count();
+                                            $faqsCount = \App\Models\Faq::where('is_active',1)->count();
+                                        } catch (\Throwable $e) {}
 
-                                    $resources = collect([
-                                        ['label' => 'Internship', 'url' => route('internship'), 'count' => 1],
-                                        ['label' => 'Events', 'url' => route('events'), 'count' => $eventsCount],
-                                        ['label' => 'Gallery', 'url' => route('gallery'), 'count' => $galleryCount],
-                                        ['label' => 'Blogs', 'url' => route('blog'), 'count' => $blogsCount],
-                                        ['label' => 'Testimonials', 'url' => route('testimonials'), 'count' => $testimonialsCount],
-                                        ['label' => 'FAQs', 'url' => route('faqs.page'), 'count' => $faqsCount],
-                                    ])->filter(fn($r) => (int) $r['count'] > 0);
-                                @endphp
-                                @foreach($resources as $r)
-                                    <a href="{{ $r['url'] }}" class="dropdown-item">
-                                        {{ $r['label'] }}
-                                    </a>
-                                @endforeach
+                                        $resources = collect([
+                                            ['label' => 'Internship', 'url' => route('internship'), 'count' => 1],
+                                            ['label' => 'Events', 'url' => route('events'), 'count' => $eventsCount],
+                                            ['label' => 'Gallery', 'url' => route('gallery'), 'count' => $galleryCount],
+                                            ['label' => 'Blogs', 'url' => route('blog'), 'count' => $blogsCount],
+                                            ['label' => 'Testimonials', 'url' => route('testimonials'), 'count' => $testimonialsCount],
+                                            ['label' => 'FAQs', 'url' => route('faqs.page'), 'count' => $faqsCount],
+                                        ])->filter(fn($r) => (int) $r['count'] > 0);
+                                    @endphp
+                                    @foreach($resources as $r)
+                                        <a href="{{ $r['url'] }}" class="dropdown-item">
+                                            {{ $r['label'] }}
+                                        </a>
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
                     @elseif($item->item_type === 'presentation')
@@ -845,23 +906,38 @@
                             <span style="font-size:10px;font-weight:800;background:linear-gradient(135deg,#00f0ff,#0284c7);color:#040714;padding:2px 8px;border-radius:999px;margin-left:auto">{{ $item->badge_text }}</span>
                         @endif
                     </a>
-                @elseif($item->item_type === 'dropdown_resources')
+                @elseif($item->item_type === 'dropdown_resources' || ($item->activeChildren && $item->activeChildren->isNotEmpty()))
                     <div class="mobile-menu-section">{{ $item->title }}</div>
-                    @php
-                        $mobileRes = collect([
-                            ['label' => 'Internship', 'url' => route('internship')],
-                            ['label' => 'Events', 'url' => route('events')],
-                            ['label' => 'Gallery', 'url' => route('gallery')],
-                            ['label' => 'Blogs', 'url' => route('blog')],
-                            ['label' => 'Testimonials', 'url' => route('testimonials')],
-                            ['label' => 'FAQs', 'url' => route('faqs.page')],
-                        ]);
-                    @endphp
-                    @foreach($mobileRes as $mr)
-                        <a href="{{ $mr['url'] }}" class="mobile-menu-link">
-                            <span class="mobile-menu-text">{{ $mr['label'] }}</span>
-                        </a>
-                    @endforeach
+                    @if($item->activeChildren && $item->activeChildren->isNotEmpty())
+                        @foreach($item->activeChildren as $child)
+                            @php
+                                $childUrl = $child->url ? (str_starts_with($child->url, 'http') || str_starts_with($child->url, '/') || str_starts_with($child->url, '#') ? $child->url : url($child->url)) : '#';
+                            @endphp
+                            <a href="{{ $childUrl }}" target="{{ $child->target ?: '_self' }}" class="mobile-menu-link">
+                                @if($child->icon)<i class="{{ $child->icon }}" style="margin-right:8px;font-size:13px;opacity:0.85"></i>@endif
+                                <span class="mobile-menu-text">{{ $child->title }}</span>
+                                @if($child->badge_text)
+                                    <span style="font-size:10px;font-weight:800;background:rgba(255,255,255,0.2);color:white;padding:2px 8px;border-radius:999px;margin-left:auto">{{ $child->badge_text }}</span>
+                                @endif
+                            </a>
+                        @endforeach
+                    @else
+                        @php
+                            $mobileRes = collect([
+                                ['label' => 'Internship', 'url' => route('internship')],
+                                ['label' => 'Events', 'url' => route('events')],
+                                ['label' => 'Gallery', 'url' => route('gallery')],
+                                ['label' => 'Blogs', 'url' => route('blog')],
+                                ['label' => 'Testimonials', 'url' => route('testimonials')],
+                                ['label' => 'FAQs', 'url' => route('faqs.page')],
+                            ]);
+                        @endphp
+                        @foreach($mobileRes as $mr)
+                            <a href="{{ $mr['url'] }}" class="mobile-menu-link">
+                                <span class="mobile-menu-text">{{ $mr['label'] }}</span>
+                            </a>
+                        @endforeach
+                    @endif
                 @else
                     @php
                         $itemUrl = $item->url ? (str_starts_with($item->url, 'http') || str_starts_with($item->url, '/') || str_starts_with($item->url, '#') ? $item->url : url($item->url)) : '#';
