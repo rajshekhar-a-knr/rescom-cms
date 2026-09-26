@@ -1106,8 +1106,8 @@
                         </div>
 
                         <div class="s-spotlight-footer">
-                            <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:4px"></i> ISO 27001 Aligned</span>
-                            <span>24/7 Dedicated Support SLA</span>
+                            <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:4px"></i> RERA Compliant</span>
+                            <span>Structural & Architectural Rigor</span>
                         </div>
                     </div>
                 </div>
@@ -1123,15 +1123,15 @@
                     <div class="s-spec-icon-box"><i class="fas fa-layer-group"></i></div>
                     <div>
                         <div class="s-spec-label">Service Domain</div>
-                        <div class="s-spec-val">{{ $service->category?->name ?? 'Technology Solutions' }}</div>
+                        <div class="s-spec-val">{{ $service->category?->name ?? 'Real Estate & Infrastructure' }}</div>
                     </div>
                 </div>
 
                 <div class="s-spec-card">
-                    <div class="s-spec-icon-box"><i class="fas fa-cubes"></i></div>
+                    <div class="s-spec-icon-box"><i class="fas fa-drafting-compass"></i></div>
                     <div>
-                        <div class="s-spec-label">Architecture Model</div>
-                        <div class="s-spec-val">Custom &amp; Cloud Native</div>
+                        <div class="s-spec-label">Execution Model</div>
+                        <div class="s-spec-val">Design-Build &amp; Advisory</div>
                     </div>
                 </div>
 
@@ -1139,15 +1139,15 @@
                     <div class="s-spec-icon-box"><i class="fas fa-tasks"></i></div>
                     <div>
                         <div class="s-spec-label">Delivery Framework</div>
-                        <div class="s-spec-val">Agile CI/CD Sprints</div>
+                        <div class="s-spec-val">RERA &amp; Municipal Compliance</div>
                     </div>
                 </div>
 
                 <div class="s-spec-card">
                     <div class="s-spec-icon-box"><i class="fas fa-shield-check"></i></div>
                     <div>
-                        <div class="s-spec-label">Service Reliability</div>
-                        <div class="s-spec-val" style="color:#0284c7">99.9% Uptime Guarantee</div>
+                        <div class="s-spec-label">Service Assurance</div>
+                        <div class="s-spec-val" style="color:#0284c7">Clear Title &amp; Quality</div>
                     </div>
                 </div>
             </div>
@@ -1233,31 +1233,31 @@
                         <!-- Engagement Lifecycle & Roadmap -->
                         <div style="margin-top:40px;padding-top:32px;border-top:1.5px dashed #e2e8f0">
                             <h3 style="font-size:19px;font-weight:850;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px">
-                                <i class="fas fa-project-diagram" style="color:#0284c7"></i> Delivery &amp; Execution Roadmap
+                                <i class="fas fa-project-diagram" style="color:#0284c7"></i> Delivery &amp; Execution Lifecycle
                             </h3>
                             <p style="font-size:14px;color:#64748b;margin-bottom:20px">
-                                Our end-to-end delivery framework ensures rapid time-to-market with zero compromise on enterprise security and scalability.
+                                Our end-to-end property framework ensures transparent milestones with zero compromise on engineering standards and regulatory compliance.
                             </p>
                             <div class="s-roadmap-grid">
                                 <div class="s-roadmap-step">
                                     <span class="s-step-number">PHASE 01</span>
-                                    <div class="s-step-title">Discovery &amp; Scope</div>
-                                    <p class="s-step-desc">Requirements blueprint, architecture design, and sprint milestones.</p>
+                                    <div class="s-step-title">Consultation &amp; Scope</div>
+                                    <p class="s-step-desc">Site feasibility, budget planning, client requirements, and blueprint design.</p>
                                 </div>
                                 <div class="s-roadmap-step">
                                     <span class="s-step-number">PHASE 02</span>
-                                    <div class="s-step-title">Agile Build</div>
-                                    <p class="s-step-desc">Iterative engineering, code reviews, and continuous integration.</p>
+                                    <div class="s-step-title">Planning &amp; Approvals</div>
+                                    <p class="s-step-desc">Architectural drawings, structural vetting, and municipal/RERA compliance.</p>
                                 </div>
                                 <div class="s-roadmap-step">
                                     <span class="s-step-number">PHASE 03</span>
-                                    <div class="s-step-title">Security &amp; QA</div>
-                                    <p class="s-step-desc">Automated testing, penetration testing, and performance optimization.</p>
+                                    <div class="s-step-title">Precision Execution</div>
+                                    <p class="s-step-desc">High-grade material procurement, on-site supervision, and quality assurance.</p>
                                 </div>
                                 <div class="s-roadmap-step">
                                     <span class="s-step-number">PHASE 04</span>
-                                    <div class="s-step-title">Deployment &amp; SLA</div>
-                                    <p class="s-step-desc">Cloud rollout, 24/7 telemetry monitoring, and dedicated maintenance.</p>
+                                    <div class="s-step-title">Handover &amp; Care</div>
+                                    <p class="s-step-desc">Final inspection, possession handover, and proactive property maintenance.</p>
                                 </div>
                             </div>
                         </div>
@@ -1273,10 +1273,10 @@
                             <div style="position:relative;z-index:2">
                                 <h3 class="s-sidebar-cta-title">Need {{ $service->title }}?</h3>
                                 <p class="s-sidebar-cta-desc">
-                                    Schedule a consultation with our principal solution architects to scope your technical requirements.
+                                    Schedule a consultation with our real estate and architectural specialists to discuss your property needs.
                                 </p>
                                 <a href="{{ route('contact') }}?service={{ urlencode($service->slug) }}" class="s-btn-primary" style="width:100%;justify-content:center;margin-bottom:12px">
-                                    <i class="fas fa-comments"></i>
+                                    <i class="fas fa-calendar-check"></i>
                                     <span>Request Consultation</span>
                                 </a>
                                 <a href="{{ route('services') }}" class="s-btn-secondary" style="width:100%;justify-content:center;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15)">
@@ -1285,9 +1285,9 @@
                                 </a>
 
                                 <div class="s-sidebar-trust-list">
-                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> ISO 27001 Security Standard</div>
-                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> Strict SLA Guarantees</div>
-                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> NDA &amp; IP Protection</div>
+                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> RERA Registered &amp; Compliant</div>
+                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> Transparent Pricing &amp; Timelines</div>
+                                    <div class="s-sidebar-trust-item"><i class="fas fa-check-circle"></i> End-to-End Legal Assurance</div>
                                 </div>
                             </div>
                         </div>
@@ -1324,13 +1324,13 @@
     <section class="cta-section" style="width:100%">
         <div class="s-container" style="position:relative;z-index:1;text-align:center">
             <div class="section-badge" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);margin-bottom:20px">
-                {{ setting('home_cta_badge', 'Start Your Project Today') }}
+                {{ setting('home_cta_badge', 'Start Your Property Journey Today') }}
             </div>
-            <h2>Ready To Scale With {{ $service->title }}?</h2>
-            <p>Connect with our technical leads to architect and deliver your custom solution.</p>
+            <h2>Ready To Get Started With {{ $service->title }}?</h2>
+            <p>Connect with our real estate and engineering specialists for personalized advisory and project planning.</p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:24px">
                 <a href="{{ route('contact') }}?service={{ urlencode($service->slug) }}" class="btn" style="background:white;color:var(--primary);padding:16px 36px;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,0.2)">
-                    <i class="fas fa-comments"></i> Request Service Proposal
+                    <i class="fas fa-calendar-check"></i> Book Consultation
                 </a>
                 <a href="{{ route('services') }}" class="btn btn-outline-white" style="padding:16px 36px;font-size:15px">
                     <i class="fas fa-eye"></i> Explore Services

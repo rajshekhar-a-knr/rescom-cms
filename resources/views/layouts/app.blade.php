@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <title>@yield('title', setting('site_name', 'Rescom')) {{ setting('meta_title_suffix', ' | IT Solutions Company') }}</title>
-    <meta name="description" content="@yield('meta_description', setting('site_description', 'Rescom - Leading IT Solutions Company'))">
-    <meta name="keywords" content="@yield('meta_keywords', 'IT solutions, web development, mobile app development, cloud computing, cybersecurity, AI, digital transformation')">
+    <title>@yield('title', setting('site_name', 'Rescom')) {{ setting('meta_title_suffix', ' | Real Estate & Property Solutions') }}</title>
+    <meta name="description" content="@yield('meta_description', setting('site_description', 'Rescom - Premier Real Estate, Architecture & Property Solutions'))">
+    <meta name="keywords" content="@yield('meta_keywords', 'Real Estate, Residential Properties, Commercial Spaces, Architectural Design, Structural Engineering, Building Maintenance, Bengaluru Real Estate, RERA Approved')">
     <meta name="author" content="Rescom">
     <meta name="robots" content="index, follow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -1021,16 +1021,14 @@
 <footer class="footer" id="mainFooter">
     <div class="footer-container">
         @php
-            $footerServicesItems = collect();
+            $footerServices = collect();
             $footerCompanyItems = collect();
             $footerPolicyItems = collect();
             $footerLegalPages = collect();
             $footerPages = collect();
 
             try {
-                $footerServicesItems = \App\Models\MenuItem::where('menu_id', 2)
-                    ->where('section', 'services')
-                    ->where('is_active', 1)
+                $footerServices = \App\Models\Service::where('is_active', 1)
                     ->orderBy('sort_order')
                     ->orderBy('id')
                     ->get();
@@ -1109,46 +1107,17 @@
             <div>
                 <h4 class="footer-title">{{ setting('footer_services_title', 'Our Services') }}</h4>
                 <ul class="footer-links">
-                    @if($footerServicesItems->isNotEmpty())
-                        @foreach($footerServicesItems as $item)
-                            @php
-                                $sUrl = $item->url ? (str_starts_with($item->url, 'http') || str_starts_with($item->url, '/') || str_starts_with($item->url, '#') ? $item->url : url($item->url)) : '#';
-                            @endphp
-                            <li>
-                                <a href="{{ $sUrl }}" target="{{ $item->target ?: '_self' }}">
-                                    {{ $item->title }}
-                                    @if($item->badge_text)
-                                        <span style="font-size:9.5px;font-weight:800;background:var(--accent);color:white;padding:1px 6px;border-radius:999px;margin-left:4px">{{ $item->badge_text }}</span>
-                                    @endif
-                                </a>
-                            </li>
-                        @endforeach
-                    @else
-                        @php
-                            $customFooterServices = json_decode(setting('footer_services_links', ''), true);
-                            if (is_array($customFooterServices) && !empty($customFooterServices)) {
-                                $footerServicesLinks = $customFooterServices;
-                            } else {
-                                try {
-                                    $footerServicesLinks = \App\Models\Service::where('is_active', 1)
-                                        ->orderBy('sort_order')
-                                        ->orderBy('id')
-                                        ->take(8)
-                                        ->get()
-                                        ->map(fn($s) => [
-                                            'label' => $s->title,
-                                            'url' => route('services.show', $s->slug)
-                                        ])
-                                        ->all();
-                                } catch (\Throwable $e) {
-                                    $footerServicesLinks = [];
-                                }
-                            }
-                        @endphp
-                        @foreach($footerServicesLinks as $link)
-                            <li><a href="{{ $link['url'] ?? '#' }}">{{ $link['label'] ?? '' }}</a></li>
-                        @endforeach
-                    @endif
+                    @forelse($footerServices as $service)
+                        <li>
+                            <a href="{{ route('services.show', $service->slug) }}">
+                                {{ $service->title }}
+                            </a>
+                        </li>
+                    @empty
+                        <li>
+                            <a href="{{ route('services') }}">All Services</a>
+                        </li>
+                    @endforelse
                 </ul>
             </div>
             @endif
@@ -1333,7 +1302,7 @@
 
 <!-- WhatsApp Float -->
 @if(setting('whatsapp_number'))
-<a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', setting('whatsapp_number')) }}?text=Hi, I would like to know more about your IT services." 
+<a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', setting('whatsapp_number')) }}?text=Hi, I would like to know more about your real estate and property services." 
    target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'About Rescom - Enterprise IT Pioneers, Leadership & Core Values')
-@section('meta_description', 'Learn about Rescom - founded in 2021, 150+ team members, 500+ projects delivered across 20+ countries. We engineer mission-critical digital systems.')
+@section('title', setting('about_meta_title', 'About Rescom - Premier Real Estate & Construction Leadership'))
+@section('meta_description', setting('about_meta_description', 'Learn about Rescom - premier residential & commercial real estate advisory, architectural design, structural engineering, and building maintenance in Bengaluru.'))
 
 @section('content')
 <!-- =============== FUTURISTIC ABOUT HERO (DARK CYBER THEME - FULL WIDTH) =============== -->
@@ -1245,35 +1245,35 @@
         <!-- Live HUD Beacon -->
         <div class="f-hud-badge" data-aos="fade-down">
             <span class="f-radar-dot"></span>
-            <span class="f-badge-subtitle">ENTERPRISE IT PIONEERS</span>
+            <span class="f-badge-subtitle">REAL ESTATE & INFRASTRUCTURE</span>
             <span class="f-badge-divider"></span>
-            <span class="f-badge-tag"><i class="fas fa-building"></i> {{ $about?->hero_badge ?? 'EST. 2021' }} · GLOBAL SCALE</span>
+            <span class="f-badge-tag"><i class="fas fa-building"></i> {{ $about?->hero_badge ?? 'RESCOM' }} · RERA VERIFIED</span>
         </div>
 
         <!-- Headline -->
         <h1 class="f-hero-title" data-aos="fade-up">
-            {{ $about?->hero_title ?? 'Architecting Digital Systems That' }} <span class="f-gradient-text">{{ $about?->hero_highlight ?? 'Shape The Future' }}</span>
+            {{ $about?->hero_title ?? 'Building Spaces & Delivering' }} <span class="f-gradient-text">{{ $about?->hero_highlight ?? 'Real Estate Excellence' }}</span>
         </h1>
 
         <p class="f-hero-desc" data-aos="fade-up" data-aos-delay="100">
-            We are a global team of enterprise software engineers, cloud architects, and product innovators building high-performance digital ecosystems for leading worldwide brands.
+            We are a dedicated team of real estate advisors, architects, structural engineers, and property managers delivering end-to-end residential and commercial property solutions.
         </p>
 
         <!-- Catalog Telemetry Capsule -->
         <div class="f-catalog-stats" data-aos="fade-up" data-aos-delay="200">
             <div class="f-stat-item">
                 <span class="f-stat-val">500+</span>
-                <span>Projects Delivered</span>
+                <span>Properties Managed</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">20+</span>
-                <span>Global Countries</span>
+                <span class="f-stat-val">100+</span>
+                <span>Prime Projects</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">99.9%</span>
-                <span>Uptime Guarantee</span>
+                <span class="f-stat-val">100%</span>
+                <span>RERA Verified</span>
             </div>
         </div>
     </div>
@@ -1284,16 +1284,16 @@
     <div class="f-wide-container">
         <div class="f-who-grid" data-aos="fade-up">
             <div>
-                <div class="f-section-badge"><i class="fas fa-user-group"></i> Corporate Identity</div>
+                <div class="f-section-badge"><i class="fas fa-building"></i> Corporate Identity</div>
                 <h2 class="f-section-title">Who We Are & What We Stand For</h2>
                 <div style="font-size:16.5px;line-height:1.85;color:#475569">
-                    {!! $about?->hero_subtitle ?? 'We are a team of passionate technologists committed to delivering innovative IT solutions that help businesses grow, scale, and succeed in the digital era.' !!}
+                    {!! $about?->hero_subtitle ?? 'We are a dedicated team of real estate advisors, architects, structural engineers, and property managers delivering end-to-end residential and commercial property solutions across Bengaluru.' !!}
                 </div>
                 <div class="f-who-pills">
-                    <div class="f-who-pill"><i class="fas fa-shield-halved"></i> Trusted Delivery</div>
-                    <div class="f-who-pill"><i class="fas fa-globe"></i> Global Footprint</div>
-                    <div class="f-who-pill"><i class="fas fa-lightbulb"></i> Innovation First</div>
-                    <div class="f-who-pill"><i class="fas fa-microchip"></i> Cloud Native Architecture</div>
+                    <div class="f-who-pill"><i class="fas fa-shield-halved"></i> 100% RERA Compliant</div>
+                    <div class="f-who-pill"><i class="fas fa-city"></i> Prime Urban Corridors</div>
+                    <div class="f-who-pill"><i class="fas fa-drafting-compass"></i> Architectural Design</div>
+                    <div class="f-who-pill"><i class="fas fa-screwdriver-wrench"></i> Complete Property Care</div>
                 </div>
             </div>
 
@@ -1304,9 +1304,9 @@
                         <div class="f-highlight-icon">
                             <i class="fas fa-award"></i>
                         </div>
-                        <h3 class="f-highlight-title">Experience That Scales Globally</h3>
+                        <h3 class="f-highlight-title">Experience You Can Trust</h3>
                         <p class="f-highlight-body">
-                            {{ $about?->story_body_2 ?? 'We serve clients across regions with a consistent focus on quality, security, and measurable outcomes.' }}
+                            {{ $about?->story_body_2 ?? 'We serve property buyers, investors, and developers with a consistent focus on quality, legal transparency, and measurable returns.' }}
                         </p>
                     </div>
                 </div>
@@ -1323,14 +1323,14 @@
             <div data-aos="fade-right">
                 <div class="f-section-badge"><i class="fas fa-flag"></i> {{ $about?->story_badge ?? 'Our Heritage' }}</div>
                 <h2 class="f-section-title">
-                    {{ $about?->story_title ?? 'From a Fast-Growing Squad to a' }}
-                    <span style="color:#0284c7">{{ $about?->story_highlight ?? 'Global IT Partner' }}</span>
+                    {{ $about?->story_title ?? 'From Visionary Foundations to a' }}
+                    <span style="color:#0284c7">{{ $about?->story_highlight ?? 'Premier Real Estate Leader' }}</span>
                 </h2>
                 <p class="f-story-p">
-                    {{ $about?->story_body_1 ?? 'Founded in 2021, Rescom started with a clear vision to democratize enterprise-grade technology and engineering practices. We grew rapidly by delivering robust, secure, and scalable architectures for every partner.' }}
+                    {{ $about?->story_body_1 ?? 'Founded with a clear vision to redefine property development and management, Rescom delivers high-value residential, commercial, architectural, and maintenance solutions tailored to our clients\' unique aspirations.' }}
                 </p>
                 <p class="f-story-p">
-                    {{ $about?->story_body_2 ?? 'Today, with certified professionals across multiple offices, we serve 200+ clients across 20+ countries. Our journey is defined by one constant: an unrelenting commitment to quality, engineering rigor, and client outcomes.' }}
+                    {{ $about?->story_body_2 ?? 'Today, with experienced property consultants, certified structural engineers, and architects, we manage and deliver premier properties across key urban corridors with uncompromising legal transparency and craftsmanship.' }}
                 </p>
             </div>
 
@@ -1339,14 +1339,14 @@
                 <div class="f-values-wrap">
                     <h3 class="f-values-heading">
                         <i class="fas fa-layer-group" style="color:#0284c7"></i>
-                        <span>{{ $about?->values_title ?? 'Our Core Architectural Values' }}</span>
+                        <span>{{ $about?->values_title ?? 'Our Core Values' }}</span>
                     </h3>
                     @php
                         $values = $about?->values ?? [
-                            ['icon' => 'fas fa-star','title' => 'Excellence First','desc' => 'We never compromise on quality. Every line of code and design decision is held to the highest standard.'],
-                            ['icon' => 'fas fa-handshake','title' => 'Client Partnership','desc' => 'We treat every client\'s project as our own. Your success is our mission.'],
-                            ['icon' => 'fas fa-lightbulb','title' => 'Innovation Always','desc' => 'We stay at the cutting edge so our partners always benefit from modern, resilient solutions.'],
-                            ['icon' => 'fas fa-shield-alt','title' => 'Trust & Transparency','desc' => 'Direct communication, realistic timelines, and full engineering accountability.'],
+                            ['icon' => 'fas fa-star','title' => 'Excellence First','desc' => 'We never compromise on quality. Every structural blueprint, property transaction, and maintenance service is held to the highest standard.'],
+                            ['icon' => 'fas fa-handshake','title' => 'Client Partnership','desc' => 'We treat every property search, investment, and construction project as our own. Your satisfaction is our mission.'],
+                            ['icon' => 'fas fa-drafting-compass','title' => 'Architectural Mastery','desc' => 'We integrate modern design principles, smart building technologies, and durable materials into every project.'],
+                            ['icon' => 'fas fa-shield-alt','title' => 'Trust & Transparency','desc' => '100% clear titles, RERA compliance, realistic timelines, and full legal accountability.'],
                         ];
                     @endphp
                     @foreach($values as $value)
@@ -1370,7 +1370,7 @@
 <section class="f-vision-section">
     <div class="f-wide-container">
         <div class="f-section-badge"><i class="fas fa-compass"></i> Guiding Principles</div>
-        <h2 class="f-section-title">What Guides Our Engineering Squads</h2>
+        <h2 class="f-section-title">What Guides Our Vision & Practice</h2>
 
         <div class="f-vision-grid" data-aos="fade-up">
             <div class="f-vision-card">
@@ -1379,7 +1379,7 @@
                     <span>{{ $about?->vision_title ?? 'Our Strategic Vision' }}</span>
                 </h3>
                 <p class="f-vision-text">
-                    {{ $about?->vision_body ?? 'To be the most trusted technology partner for forward-thinking organizations worldwide by delivering digital systems that create measurable and lasting impact.' }}
+                    {{ $about?->vision_body ?? 'To be the premier real estate and property development partner, creating sustainable residential communities, iconic commercial hubs, and world-class architectural spaces.' }}
                 </p>
             </div>
 
@@ -1389,7 +1389,7 @@
                     <span>{{ $about?->mission_title ?? 'Our Mission Objective' }}</span>
                 </h3>
                 <p class="f-vision-text">
-                    {{ $about?->mission_body ?? 'To empower global businesses with modern, secure, and scalable cloud technology solutions that accelerate market agility and operational efficiency.' }}
+                    {{ $about?->mission_body ?? 'To provide clients with comprehensive real estate consulting, superior structural engineering, flawless architectural design, and reliable property maintenance services.' }}
                 </p>
             </div>
         </div>
@@ -1569,8 +1569,8 @@
     <div class="f-wide-container">
         <div style="text-align:center;margin-bottom:44px" data-aos="fade-up">
             <div class="f-section-badge"><i class="fas fa-users"></i> Executive Leadership</div>
-            <h2 class="f-section-title" style="margin-bottom:12px">The Brilliant Minds Behind Our Technology</h2>
-            <p style="color:#64748b;font-size:15px;max-width:640px;margin:0 auto">Multidisciplinary directors and technical architects driving engineering excellence across all departments.</p>
+            <h2 class="f-section-title" style="margin-bottom:12px">The Leadership Team Behind Rescom</h2>
+            <p style="color:#64748b;font-size:15px;max-width:640px;margin:0 auto">Experienced real estate leaders, architects, and structural engineering directors driving excellence across every property.</p>
         </div>
 
         <div class="f-team-grid">
@@ -1603,17 +1603,17 @@
     <div class="f-wide-container">
         <div style="margin-bottom:40px" data-aos="fade-up">
             <div class="f-section-badge"><i class="fas fa-trophy"></i> Strategic Advantage</div>
-            <h2 class="f-section-title">Why Leading Enterprises Partner With Rescom</h2>
+            <h2 class="f-section-title">Why Homeowners & Investors Choose Rescom</h2>
         </div>
 
         <div class="f-advantage-grid">
             @foreach([
-                ['fas fa-certificate','#0284c7','Certified Excellence','ISO 9001:2021 certified squads with certified practitioners across AWS, Azure, Google Cloud, and zero-trust cybersecurity.'],
-                ['fas fa-globe','#10b981','Global Delivery Reach','Successfully deployed complex architectures in 20+ countries including USA, UK, UAE, Singapore, Australia, and India.'],
-                ['fas fa-bolt','#f59e0b','High-Velocity Execution','96% of enterprise platforms delivered on or ahead of sprint schedules — backed by automated CI/CD and IaC pipelines.'],
-                ['fas fa-headset','#ef4444','24/7 Dedicated Support','Round-the-clock priority monitoring with dedicated squads and rapid resolution response SLAs.'],
-                ['fas fa-dollar-sign','#8b5cf6','Transparent Economics','Enterprise grade delivery at clear, predictable pricing models tailored for startups and global enterprises.'],
-                ['fas fa-sync','#06b6d4','Agile Squad Model','Sprint-based iterations with weekly interactive staging reviews ensuring complete visibility at every stage.'],
+                ['fas fa-certificate','#0284c7','RERA & Legal Compliance','100% verified property titles, statutory municipal approvals, and complete regulatory transparency on every project.'],
+                ['fas fa-city','#10b981','Prime Commercial & Residential Hubs','Strategic property locations with high rental yields, seamless connectivity, and long-term capital appreciation.'],
+                ['fas fa-drafting-compass','#f59e0b','Architectural & Structural Rigor','In-house certified architects and structural engineers delivering durable, aesthetically inspiring spaces.'],
+                ['fas fa-screwdriver-wrench','#ef4444','Lifecycle Building Maintenance','Comprehensive post-handover facility care, preventive structural maintenance, and round-the-clock property management.'],
+                ['fas fa-hand-holding-dollar','#8b5cf6','Transparent Value & Pricing','Clear financial structures, honest pricing without hidden costs, and competitive investment advisory.'],
+                ['fas fa-handshake','#06b6d4','End-to-End Client Service','From initial site visits and legal vetting to interior design and key handover, we manage every detail seamlessly.'],
             ] as [$icon,$color,$title,$desc])
             <div class="f-advantage-card" data-aos="fade-up">
                 <div class="f-advantage-icon-bay" style="background:{{ $color }}18;color:{{ $color }};border:1px solid {{ $color }}35">
@@ -1661,18 +1661,18 @@
 <section class="futuristic-cta-banner" data-aos="fade-up">
     <div class="f-wide-container">
         <div class="f-cta-box">
-            <h2 class="f-cta-title">Ready to Engineer Something Extraordinary?</h2>
+            <h2 class="f-cta-title">Ready to Find Your Ideal Property or Build Your Next Project?</h2>
             <p class="f-cta-desc">
-                Partner with 150+ certified engineers and technical leads to build, scale, and secure your next-generation digital ecosystem.
+                Connect with our experienced property advisors, architects, and engineering consultants to turn your real estate vision into reality.
             </p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
                 <a href="{{ route('contact') }}" class="f-btn-primary">
                     <i class="fas fa-comments"></i>
-                    <span>Consult Our Architects</span>
+                    <span>Book Free Consultation</span>
                 </a>
                 <a href="{{ route('portfolio') }}" class="f-btn-secondary">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Explore Products</span>
+                    <i class="fas fa-building"></i>
+                    <span>Explore Properties</span>
                 </a>
                 <a href="{{ route('presentation.show', 'rescom-presentation') }}" target="_blank" class="f-btn-secondary" style="background:#070d1d;color:#38bdf8 !important;border-color:rgba(56,189,248,0.4)">
                     <i class="fas fa-desktop"></i>

@@ -56,11 +56,10 @@
     <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:12px">
         <div>
             <h3 class="card-title" style="margin:0 0 4px 0;font-size:16px">Footer Column Links</h3>
-            <p style="margin:0;font-size:12px;color:var(--text-muted)">Toggle Active / Inactive for individual footer links across Services, Company, and Policies columns.</p>
+            <p style="margin:0;font-size:12px;color:var(--text-muted)">Manage and toggle footer links for Company and Policies columns. Services are dynamically listed from the Services Module.</p>
         </div>
         <div style="display:flex;gap:6px" id="footerFilterPills">
             <button type="button" class="btn btn-sm btn-primary active-pill" onclick="filterFooterSection('all', this)" style="border-radius:999px;font-size:12px;padding:4px 12px">All ({{ $menuItems->count() }})</button>
-            <button type="button" class="btn btn-sm btn-secondary" onclick="filterFooterSection('services', this)" style="border-radius:999px;font-size:12px;padding:4px 12px">Services ({{ $menuItems->where('section', 'services')->count() }})</button>
             <button type="button" class="btn btn-sm btn-secondary" onclick="filterFooterSection('company', this)" style="border-radius:999px;font-size:12px;padding:4px 12px">Company ({{ $menuItems->where('section', 'company')->count() }})</button>
             <button type="button" class="btn btn-sm btn-secondary" onclick="filterFooterSection('policies', this)" style="border-radius:999px;font-size:12px;padding:4px 12px">Policies ({{ $menuItems->where('section', 'policies')->count() }})</button>
         </div>
@@ -160,7 +159,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                         <div>
                             <div style="font-weight:700;font-size:14px;color:#1e293b">Column 1: Services List</div>
-                            <div style="font-size:12px;color:var(--text-muted)">Enable/disable the entire Services links column</div>
+                            <div style="font-size:12px;color:var(--text-muted)">Displays active services from Services Module automatically</div>
                         </div>
                         <label class="toggle-switch">
                             <input type="hidden" name="footer_services_enabled" value="0">
@@ -169,6 +168,9 @@
                         </label>
                     </div>
                     <input type="text" name="footer_services_title" class="form-control form-control-sm" value="{{ $get('footer_services_title', 'Our Services') }}" placeholder="Column Title">
+                    <div style="margin-top:6px;font-size:12px;color:#0284c7">
+                        <i class="fas fa-info-circle"></i> Services are managed in <a href="{{ route('admin.services.index') }}" style="color:#0284c7;font-weight:600;text-decoration:underline">Services Module</a>.
+                    </div>
                 </div>
 
                 <!-- Column 2: Company -->
@@ -294,7 +296,6 @@
             <div class="form-group" style="margin-bottom:14px">
                 <label class="form-label" style="font-weight:700">Footer Section / Column *</label>
                 <select name="section" class="form-control" required>
-                    <option value="services">Column 1: Services</option>
                     <option value="company">Column 2: Company</option>
                     <option value="policies">Column 3: Policies</option>
                     <option value="quick_links">Quick Links / Custom</option>
@@ -303,12 +304,12 @@
 
             <div class="form-group" style="margin-bottom:14px">
                 <label class="form-label" style="font-weight:700">Link Title *</label>
-                <input type="text" name="title" class="form-control" required placeholder="e.g. About Us, Web Development, Privacy Policy">
+                <input type="text" name="title" class="form-control" required placeholder="e.g. About Us, Privacy Policy">
             </div>
 
             <div class="form-group" style="margin-bottom:14px">
                 <label class="form-label" style="font-weight:700">URL Destination *</label>
-                <input type="text" name="url" class="form-control" required placeholder="e.g. /about or /services or https://...">
+                <input type="text" name="url" class="form-control" required placeholder="e.g. /about or /contact or https://...">
             </div>
 
             <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
@@ -358,7 +359,6 @@
             <div class="form-group" style="margin-bottom:14px">
                 <label class="form-label" style="font-weight:700">Footer Section / Column *</label>
                 <select id="editFooterSection" name="section" class="form-control" required>
-                    <option value="services">Column 1: Services</option>
                     <option value="company">Column 2: Company</option>
                     <option value="policies">Column 3: Policies</option>
                     <option value="quick_links">Quick Links / Custom</option>

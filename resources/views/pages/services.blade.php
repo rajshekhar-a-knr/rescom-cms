@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', setting('services_meta_title', 'Services - Enterprise Solutions & Digital Engineering | Rescom'))
-@section('meta_description', setting('services_meta_description', 'Comprehensive IT services: Custom web development, mobile apps, cloud solutions, AI/ML, cybersecurity and digital transformation.'))
+@section('title', setting('services_meta_title', 'Services - Real Estate, Architecture & Maintenance | Rescom'))
+@section('meta_description', setting('services_meta_description', 'Comprehensive property services: Residential & commercial sales, leasing, architectural design, structural engineering, and building maintenance.'))
 
 @section('content')
 <!-- =============== FUTURISTIC SERVICES HERO (DARK CYBER THEME) =============== -->
@@ -705,18 +705,18 @@
         <!-- Live HUD Beacon -->
         <div class="f-hud-badge" data-aos="fade-down">
             <span class="f-radar-dot"></span>
-            <span class="f-badge-subtitle">ENTERPRISE IT CAPABILITIES</span>
+            <span class="f-badge-subtitle">PREMIER PROPERTY CAPABILITIES</span>
             <span class="f-badge-divider"></span>
-            <span class="f-badge-tag"><i class="fas fa-cogs"></i> 2026 DEPLOYMENTS</span>
+            <span class="f-badge-tag"><i class="fas fa-building"></i> VERIFIED EXCELLENCE</span>
         </div>
 
         <!-- Headline -->
         <h1 class="f-hero-title" data-aos="fade-up">
-            End-to-End IT Services For <span class="f-gradient-text">Modern Businesses</span>
+            End-to-End Property Solutions For <span class="f-gradient-text">Modern Living & Business</span>
         </h1>
 
         <p class="f-hero-desc" data-aos="fade-up" data-aos-delay="100">
-            From ideation to deployment and beyond — we provide full-spectrum technology services that help businesses innovate, scale, and lead.
+            From property discovery and architectural planning to structural engineering and building maintenance — we provide full-spectrum real estate services.
         </p>
 
         <!-- Catalog Telemetry Capsule -->
@@ -727,13 +727,13 @@
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">99.9%</span>
-                <span>Cloud SLA</span>
+                <span class="f-stat-val">100%</span>
+                <span>RERA Verified</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">{{ $categories->count() ?? '8+' }}</span>
-                <span>Service Domains</span>
+                <span class="f-stat-val">{{ $categories->count() ?? '6+' }}</span>
+                <span>Specialized Domains</span>
             </div>
         </div>
     </div>
@@ -775,7 +775,7 @@
 
                     <div class="f-card-cat-badge">
                         <span class="f-card-cat-dot"></span>
-                        <span>{{ $service->category ? $service->category->name : 'Enterprise IT' }}</span>
+                        <span>{{ $service->category ? $service->category->name : 'Property Services' }}</span>
                     </div>
 
                     <div class="f-card-status-badge">
@@ -871,18 +871,18 @@
         <div class="f-cta-box">
             <div class="f-hud-badge" style="background:rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.3);margin-bottom:14px">
                 <span class="f-radar-dot" style="background:#0284c7;box-shadow:0 0 8px #0284c7"></span>
-                <span class="f-badge-subtitle" style="color:#0369a1">ENTERPRISE CONSULTATION</span>
+                <span class="f-badge-subtitle" style="color:#0369a1">PROPERTY CONSULTATION</span>
             </div>
-            <h2 class="f-cta-title">Ready to Accelerate Your <span class="f-gradient-text" style="background:linear-gradient(135deg,#0f172a 30%,#0284c7 70%,#2563eb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Digital Transformation?</span></h2>
-            <p class="f-cta-desc">Book a free consultation with our solutions architects to design, build, and scale world-class software architectures tailored to your enterprise.</p>
+            <h2 class="f-cta-title">Ready to Build Your Vision or <span class="f-gradient-text" style="background:linear-gradient(135deg,#0f172a 30%,#0284c7 70%,#2563eb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Find Your Ideal Property?</span></h2>
+            <p class="f-cta-desc">Book a free consultation with our real estate specialists, architects, and structural engineers tailored to your commercial or residential needs.</p>
             <div class="f-cta-actions">
                 <a href="{{ route('contact') }}" class="f-btn-primary">
                     <span>Schedule Consultation</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
                 <a href="{{ route('portfolio') }}" class="f-btn-secondary">
-                    <span>Explore Products</span>
-                    <i class="fas fa-cubes"></i>
+                    <span>Explore Properties</span>
+                    <i class="fas fa-building"></i>
                 </a>
             </div>
         </div>

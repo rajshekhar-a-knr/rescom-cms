@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Products - Enterprise Solutions & Products | Rescom')
-@section('meta_description', 'Explore our comprehensive portfolio of enterprise digital products and platforms delivered for clients across industries worldwide.')
+@section('title', setting('portfolio_meta_title', 'Portfolio - Featured Properties & Projects | Rescom'))
+@section('meta_description', setting('portfolio_meta_description', 'Explore our portfolio of premier residential developments, commercial hubs, architectural landmarks, and managed estates.'))
 
 @section('content')
 <!-- =============== FUTURISTIC PRODUCTS HERO (DARK CYBER THEME) =============== -->
@@ -691,35 +691,35 @@
         <!-- Live HUD Beacon -->
         <div class="f-hud-badge" data-aos="fade-down">
             <span class="f-radar-dot"></span>
-            <span class="f-badge-subtitle">ENTERPRISE PRODUCT SUITE</span>
+            <span class="f-badge-subtitle">ENTERPRISE PROPERTY PORTFOLIO</span>
             <span class="f-badge-divider"></span>
-            <span class="f-badge-tag"><i class="fas fa-microchip"></i> 2026 DEPLOYMENTS</span>
+            <span class="f-badge-tag"><i class="fas fa-building"></i> FEATURED DEVELOPMENTS</span>
         </div>
 
         <!-- Headline -->
         <h1 class="f-hero-title" data-aos="fade-up">
-            Products That <span class="f-gradient-text">Define Digital Excellence</span>
+            Properties That <span class="f-gradient-text">Redefine Modern Living & Commerce</span>
         </h1>
 
         <p class="f-hero-desc" data-aos="fade-up" data-aos-delay="100">
-            Explore our ecosystem of transformative software products and cloud-native solutions engineered for enterprise scale and agility.
+            Explore our portfolio of premier residential developments, commercial hubs, architectural landmarks, and managed estates.
         </p>
 
         <!-- Catalog Telemetry Capsule -->
         <div class="f-catalog-stats" data-aos="fade-up" data-aos-delay="200">
             <div class="f-stat-item">
                 <span class="f-stat-val">{{ $portfolios->total() ?? '50+' }}</span>
-                <span>Active Products</span>
+                <span>Featured Properties</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">99.9%</span>
-                <span>Cloud SLA</span>
+                <span class="f-stat-val">100%</span>
+                <span>RERA Verified</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">{{ $categories->count() ?? '10+' }}</span>
-                <span>Industry Verticals</span>
+                <span class="f-stat-val">{{ $categories->count() ?? '6+' }}</span>
+                <span>Key Categories</span>
             </div>
         </div>
     </div>
@@ -870,19 +870,19 @@
     <div class="container">
         <div class="f-cta-box" data-aos="zoom-in">
             <h2 class="f-cta-title">
-                Ready to Deploy <span class="f-gradient-text" style="background:linear-gradient(135deg, #1d4ed8 0%, #0284c7 50%, #06b6d4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Next-Gen Digital Products?</span>
+                Ready to Explore <span class="f-gradient-text" style="background:linear-gradient(135deg, #1d4ed8 0%, #0284c7 50%, #06b6d4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Exclusive Properties & Projects?</span>
             </h2>
             <p class="f-cta-desc">
-                Partner with our engineering team to architect, build, and scale bespoke technology platforms for your enterprise.
+                Partner with our real estate specialists, architects, and structural engineering team to secure or construct your ideal space.
             </p>
             <div class="f-cta-actions">
                 <a href="{{ route('contact') }}" class="f-btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    <span>Schedule Architecture Call</span>
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Schedule Consultation</span>
                 </a>
-                <a href="{{ route('demo-products.index') }}" class="f-btn-secondary">
-                    <i class="fas fa-play"></i>
-                    <span>Explore Live Demos</span>
+                <a href="{{ route('services') }}" class="f-btn-secondary">
+                    <i class="fas fa-building"></i>
+                    <span>Explore Services</span>
                 </a>
             </div>
         </div>

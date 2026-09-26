@@ -1337,8 +1337,8 @@
                 <div class="p-spec-card">
                     <div class="p-spec-icon-box"><i class="fas fa-tags"></i></div>
                     <div>
-                        <div class="p-spec-label">Product Sector</div>
-                        <div class="p-spec-val">{{ $project->category?->name ?? 'Software Platform' }}</div>
+                        <div class="p-spec-label">Development Sector</div>
+                        <div class="p-spec-val">{{ $project->category?->name ?? 'Real Estate Development' }}</div>
                     </div>
                 </div>
 
@@ -1502,13 +1502,13 @@
                         <div class="p-sidebar-cta">
                             <div class="p-sidebar-cta-glow"></div>
                             <div style="position:relative;z-index:2">
-                                <h3 class="p-sidebar-cta-title">Need a Similar Platform?</h3>
+                                <h3 class="p-sidebar-cta-title">Interested in {{ $project->title }}?</h3>
                                 <p class="p-sidebar-cta-desc">
-                                    We design, engineer, and deploy mission-critical software solutions tailored to your organization's exact workflows.
+                                    Connect with our property specialists and structural architects to discuss acquisition, leasing, or development opportunities.
                                 </p>
                                 <a href="{{ route('contact') }}?product={{ urlencode($project->slug) }}" class="p-btn-primary" style="width:100%;justify-content:center;margin-bottom:12px">
-                                    <i class="fas fa-key"></i>
-                                    <span>Request Live Demo</span>
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Schedule Site Visit</span>
                                 </a>
                                 <a href="{{ route('presentation.show', $project->slug) }}" target="_blank" class="p-btn-secondary" style="width:100%;justify-content:center;margin-bottom:12px">
                                     <i class="fas fa-desktop"></i>
@@ -1516,22 +1516,22 @@
                                 </a>
                                 <a href="{{ route('portfolio') }}" class="p-btn-secondary" style="width:100%;justify-content:center;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15)">
                                     <i class="fas fa-th-large"></i>
-                                    <span>Browse All Platforms</span>
+                                    <span>Browse All Developments</span>
                                 </a>
 
                                 <div class="p-sidebar-trust-list">
-                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> Custom Architecture Design</div>
-                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> Enterprise Grade Security</div>
-                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> Rapid Production Deployment</div>
+                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> RERA Approved &amp; Verified</div>
+                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> Architectural &amp; Engineering Rigor</div>
+                                    <div class="p-sidebar-trust-item"><i class="fas fa-check-circle"></i> End-to-End Legal Support</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Related Platforms -->
+                        <!-- Related Developments -->
                         @if($related->count())
                         <div class="p-related-card">
                             <h4 class="p-related-title">
-                                <i class="fas fa-network-wired" style="color:#0284c7"></i> Related Platforms
+                                <i class="fas fa-building" style="color:#0284c7"></i> Related Developments
                             </h4>
                             <div class="p-related-list">
                                 @foreach($related as $rel)
@@ -1563,16 +1563,16 @@
     <section class="cta-section" style="width:100%">
         <div class="p-container" style="position:relative;z-index:1;text-align:center">
             <div class="section-badge" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);margin-bottom:20px">
-                {{ setting('home_cta_badge', 'Start Your Project Today') }}
+                {{ setting('home_cta_badge', 'Start Your Property Journey Today') }}
             </div>
-            <h2>Have An Idea Like {{ $project->title }}?</h2>
-            <p>Talk with our engineering specialists to design and launch your next high-impact platform.</p>
+            <h2>Planning A Development Like {{ $project->title }}?</h2>
+            <p>Talk with our real estate and engineering specialists to plan, design, and execute your vision.</p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:24px">
                 <a href="{{ route('contact') }}?product={{ urlencode($project->slug) }}" class="btn" style="background:white;color:var(--primary);padding:16px 36px;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,0.2)">
-                    <i class="fas fa-comments"></i> Request Product Demo
+                    <i class="fas fa-calendar-check"></i> Book Project Consultation
                 </a>
                 <a href="{{ route('portfolio') }}" class="btn btn-outline-white" style="padding:16px 36px;font-size:15px">
-                    <i class="fas fa-eye"></i> Explore Portfolio
+                    <i class="fas fa-building"></i> Explore Properties
                 </a>
             </div>
         </div>

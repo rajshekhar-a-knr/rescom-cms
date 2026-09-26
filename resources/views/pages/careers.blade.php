@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Careers at Rescom - Join Our Engineering Squads')
-@section('meta_description', 'Build your career at Rescom. We offer high-impact engineering opportunities in web development, mobile platforms, cloud architecture, AI/ML, and system design.')
+@section('title', setting('careers_meta_title', 'Careers at Rescom - Join Our Real Estate & Engineering Team'))
+@section('meta_description', setting('careers_meta_description', 'Build your career at Rescom. Explore high-impact opportunities in property advisory, architectural design, structural engineering, and facility management.'))
 
 @section('content')
 <!-- =============== FUTURISTIC CAREERS HERO (DARK CYBER THEME) =============== -->
@@ -552,18 +552,18 @@
         <!-- Live HUD Beacon -->
         <div class="f-hud-badge" data-aos="fade-down">
             <span class="f-radar-dot"></span>
-            <span class="f-badge-subtitle">TALENT & ENGINEERING ECOSYSTEM</span>
+            <span class="f-badge-subtitle">CAREERS AT RESCOM</span>
             <span class="f-badge-divider"></span>
-            <span class="f-badge-tag"><i class="fas fa-users"></i> ACTIVE HIRING 2026</span>
+            <span class="f-badge-tag"><i class="fas fa-users"></i> ACTIVE HIRING</span>
         </div>
 
         <!-- Headline -->
         <h1 class="f-hero-title" data-aos="fade-up">
-            Build The Next Generation of <span class="f-gradient-text">Enterprise Technology</span>
+            Build The Future of <span class="f-gradient-text">Real Estate & Construction</span>
         </h1>
 
         <p class="f-hero-desc" data-aos="fade-up" data-aos-delay="100">
-            Join high-velocity engineering squads building mission-critical software, AI systems, and cloud infrastructure for top global brands.
+            Join our dynamic team of property advisors, architects, structural engineers, and project managers shaping iconic spaces.
         </p>
 
         <!-- Catalog Telemetry Capsule -->
@@ -575,12 +575,12 @@
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
                 <span class="f-stat-val">{{ count($departments ?? []) }}</span>
-                <span>Squad Domains</span>
+                <span>Departments</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
-                <span class="f-stat-val">Hybrid</span>
-                <span>Flexible Culture</span>
+                <span class="f-stat-val">Bengaluru</span>
+                <span>Prime Locations</span>
             </div>
         </div>
     </div>
@@ -591,7 +591,7 @@
     <div class="f-wide-container">
         <div data-aos="fade-up">
             <div class="f-section-badge"><i class="fas fa-heart"></i> Life At Rescom</div>
-            <h2 class="f-section-title">More Than a Job — <span style="color:#0284c7">An Engineering Community</span></h2>
+            <h2 class="f-section-title">More Than a Job — <span style="color:#0284c7">A Purpose-Driven Team</span></h2>
         </div>
 
         <div class="f-benefits-grid">
@@ -697,9 +697,9 @@
         <div class="f-cta-box">
             <h2 class="f-cta-title">Don't See Your Exact Role?</h2>
             <p class="f-cta-desc">
-                We are always seeking exceptional engineers, system architects, and technical minds. Transmit your portfolio and let's start a conversation.
+                We are always seeking passionate architects, structural engineers, project managers, and real estate consultants. Send your resume and portfolio to begin the conversation.
             </p>
-            <a href="mailto:careers@rescom.in" class="f-btn-primary">
+            <a href="mailto:{{ setting('contact_email', 'careers@rescom.in') }}" class="f-btn-primary">
                 <i class="fas fa-envelope"></i> Send General Application
             </a>
         </div>

@@ -1116,11 +1116,11 @@
             <div class="section-badge" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);margin-bottom:20px">
                 {{ setting('home_cta_badge', 'Stay Ahead With Rescom') }}
             </div>
-            <h2>Looking To Build Your Next Big Platform?</h2>
-            <p>Our principal technology consultants are ready to accelerate your product development roadmap.</p>
+            <h2>Looking To Buy, Lease, or Build Your Next Property?</h2>
+            <p>Our real estate specialists and architectural consultants are ready to guide your next property investment.</p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:24px">
                 <a href="{{ route('contact') }}" class="btn" style="background:white;color:var(--primary);padding:16px 36px;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,0.2)">
-                    <i class="fas fa-comments"></i> Schedule Technical Consultation
+                    <i class="fas fa-calendar-check"></i> Book Free Consultation
                 </a>
                 <a href="{{ route('blog') }}" class="btn btn-outline-white" style="padding:16px 36px;font-size:15px">
                     <i class="fas fa-eye"></i> Explore All Articles

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', setting('home_meta_title', 'Rescom - Solutions Company in India'))
-@section('meta_description', setting('home_meta_description', 'Rescom delivers world-class web development, mobile apps, cloud solutions, cybersecurity, and AI/ML services. 500+ Products delivered, 200+ happy clients.'))
+@section('title', setting('home_meta_title', 'Rescom - Premier Real Estate & Construction Solutions'))
+@section('meta_description', setting('home_meta_description', 'Rescom delivers premier residential & commercial real estate, architectural design, structural engineering, and building maintenance services across Bengaluru.'))
 
 @section('content')
 
@@ -722,9 +722,9 @@
                         <!-- Live HUD Badge -->
                         <div class="futuristic-hud-badge">
                             <span class="futuristic-radar-dot"></span>
-                            <span class="futuristic-badge-subtitle">{{ $banner->subtitle ?? 'NEXT-GEN IT ECOSYSTEM' }}</span>
+                            <span class="futuristic-badge-subtitle">{{ $banner->subtitle ?? 'PREMIER REAL ESTATE & INFRASTRUCTURE' }}</span>
                             <span class="futuristic-badge-divider"></span>
-                            <span class="futuristic-badge-tag"><i class="fas fa-bolt"></i> {{ $banner->badge_text ?? 'AI READY' }}</span>
+                            <span class="futuristic-badge-tag"><i class="fas fa-building"></i> {{ $banner->badge_text ?? 'RERA VERIFIED' }}</span>
                         </div>
 
                         <!-- Hero Futuristic Title -->
@@ -737,11 +737,11 @@
                         <p class="futuristic-hero-description">{{ $banner->description }}</p>
                         @endif
 
-                        <!-- Futuristic Micro Tech Tags -->
+                        <!-- Futuristic Micro Property Tags -->
                         <div class="futuristic-tech-tags">
-                            <span class="futuristic-tech-tag"><i class="fas fa-microchip"></i> Next-Gen Architecture</span>
-                            <span class="futuristic-tech-tag"><i class="fas fa-shield-halved"></i> Enterprise Security</span>
-                            <span class="futuristic-tech-tag"><i class="fas fa-bolt"></i> High-Speed Cloud</span>
+                            <span class="futuristic-tech-tag"><i class="fas fa-drafting-compass"></i> Architectural Design</span>
+                            <span class="futuristic-tech-tag"><i class="fas fa-cubes"></i> Structural Engineering</span>
+                            <span class="futuristic-tech-tag"><i class="fas fa-shield-halved"></i> 100% RERA Verified</span>
                         </div>
 
                         <!-- Action Buttons -->
@@ -765,17 +765,17 @@
                         <div class="futuristic-metrics-strip">
                             <div class="f-metric-item">
                                 <span class="f-metric-val">500<span>+</span></span>
-                                <span class="f-metric-lbl">Deployments</span>
+                                <span class="f-metric-lbl">Properties Managed</span>
                             </div>
                             <div class="f-metric-sep"></div>
                             <div class="f-metric-item">
-                                <span class="f-metric-val">99.9<span>%</span></span>
-                                <span class="f-metric-lbl">Uptime SLA</span>
+                                <span class="f-metric-val">100<span>%</span></span>
+                                <span class="f-metric-lbl">RERA Verified</span>
                             </div>
                             <div class="f-metric-sep"></div>
                             <div class="f-metric-item">
-                                <span class="f-metric-val">200<span>+</span></span>
-                                <span class="f-metric-lbl">Global Clients</span>
+                                <span class="f-metric-val">1000<span>+</span></span>
+                                <span class="f-metric-lbl">Happy Clients</span>
                             </div>
                         </div>
                     </div>
@@ -789,10 +789,10 @@
                 
                 <!-- Floating Hologram Widget Top -->
                 <div class="futuristic-holo-widget holo-widget-top">
-                    <div class="holo-widget-icon"><i class="fas fa-signal"></i></div>
+                    <div class="holo-widget-icon"><i class="fas fa-city"></i></div>
                     <div>
-                        <div class="holo-widget-title">Cloud Network Live</div>
-                        <div class="holo-widget-sub"><i class="fas fa-circle" style="font-size:7px;color:#10b981;margin-right:3px;"></i> 99.99% Operational</div>
+                        <div class="holo-widget-title">Prime Hubs Active</div>
+                        <div class="holo-widget-sub"><i class="fas fa-circle" style="font-size:7px;color:#10b981;margin-right:3px;"></i> Bengaluru Corridors</div>
                     </div>
                 </div>
 
@@ -806,12 +806,12 @@
                             <span class="hud-dot hud-dot-cyan"></span>
                         </div>
                         <div class="hud-terminal-address">
-                            <i class="fas fa-lock" style="font-size:10px;color:#10b981"></i>
-                            <span>rescom://</span><span class="live-node">core.cloud.v2.6/live</span>
+                            <i class="fas fa-shield-check" style="font-size:10px;color:#10b981"></i>
+                            <span>rescom://</span><span class="live-node">realty.property.v2.6/verified</span>
                         </div>
                         <div class="hud-status-badge">
                             <span class="hud-status-dot-green"></span>
-                            <span>Live 60 FPS</span>
+                            <span>RERA Verified</span>
                         </div>
                     </div>
 
@@ -832,7 +832,7 @@
                         @else
                             <div class="hero-orbit">
                                 <div class="hero-orbit-inner">
-                                    <div class="hero-orbit-core">&#128187;</div>
+                                    <div class="hero-orbit-core">&#127969;</div>
                                 </div>
                             </div>
                         @endif
@@ -843,8 +843,8 @@
                 <div class="futuristic-holo-widget holo-widget-bottom">
                     <div class="holo-widget-icon"><i class="fas fa-shield-check"></i></div>
                     <div>
-                        <div class="holo-widget-title">Zero-Trust Shield</div>
-                        <div class="holo-widget-sub">Military-Grade Defense</div>
+                        <div class="holo-widget-title">Quality & Structural Assurance</div>
+                        <div class="holo-widget-sub">Engineered For Excellence</div>
                     </div>
                 </div>
             </div>
@@ -1360,15 +1360,15 @@
             <div class="fsc-header-center">
                 <div class="f-white-hud-badge">
                     <span class="f-white-radar-dot"></span>
-                    <span class="f-white-badge-subtitle">{{ setting('home_services_badge', 'OUR SERVICE CAPABILITIES') }}</span>
+                    <span class="f-white-badge-subtitle">{{ setting('home_services_badge', 'OUR PROPERTY CAPABILITIES') }}</span>
                     <span class="f-white-badge-divider"></span>
-                    <span class="f-white-badge-tag"><i class="fas fa-cogs"></i> ENTERPRISE SOLUTIONS</span>
+                    <span class="f-white-badge-tag"><i class="fas fa-building"></i> REAL ESTATE SOLUTIONS</span>
                 </div>
                 <h2 class="fsc-center-title">
-                    {!! setting('home_services_title', 'Comprehensive <span class="f-white-gradient-text">IT Services</span> For Your Business') !!}
+                    {!! setting('home_services_title', 'Comprehensive <span class="f-white-gradient-text">Property Solutions</span> For You') !!}
                 </h2>
                 <p class="futuristic-hero-description fsc-center-desc">
-                    {{ setting('home_services_subtitle', 'From ideation to deployment, we provide end-to-end technology solutions that help businesses grow, scale, and succeed in the digital era.') }}
+                    {{ setting('home_services_subtitle', 'From residential and commercial sales to architectural design, structural engineering, and building maintenance, we deliver trusted property solutions.') }}
                 </p>
             </div>
 
@@ -1898,25 +1898,25 @@
                     <span class="f-white-radar-dot"></span>
                     <span class="f-white-badge-subtitle">{{ setting('home_why_badge', 'WHY RESCOM') }}</span>
                     <span class="f-white-badge-divider"></span>
-                    <span class="f-white-badge-tag"><i class="fas fa-shield-halved"></i> ENTERPRISE ECOSYSTEM</span>
+                    <span class="f-white-badge-tag"><i class="fas fa-shield-halved"></i> TRUSTED REAL ESTATE</span>
                 </div>
 
                 <h2 class="f-why-title">
-                    {!! setting('home_why_title', 'Your Trusted <span class="f-white-gradient-text">Technology Partner</span> Since 2019') !!}
+                    {!! setting('home_why_title', 'Your Trusted <span class="f-white-gradient-text">Real Estate Partner</span>') !!}
                 </h2>
 
                 <p class="f-why-desc">
-                    {{ setting('home_why_body', "Rescom plays a pivotal role in advancing innovation by fostering interdisciplinary collaboration and optimizing the management of digital information across platforms. Leveraging advanced mapping, analytics, and stakeholder integration, we drive productivity and create sustainable, tangible outcomes.") }}
+                    {{ setting('home_why_body', "Rescom is a full-service real estate, architectural design, structural engineering, and property maintenance company. We combine deep market expertise, legal diligence, and engineering excellence to deliver exceptional living and commercial spaces.") }}
                 </p>
 
                 @php
                     $homeWhyItems = json_decode(setting('home_why_items', ''), true);
                     if (!is_array($homeWhyItems) || empty($homeWhyItems)) {
                         $homeWhyItems = [
-                            ['icon' => 'fas fa-shield-alt', 'color' => '#0284c7', 'title' => 'Enterprise-Grade Security', 'desc' => 'All our applications follow OWASP standards and undergo rigorous security testing before deployment.'],
-                            ['icon' => 'fas fa-rocket', 'color' => '#10b981', 'title' => 'Agile Delivery', 'desc' => 'We deliver quality products on time using Agile methodology with complete transparency.'],
-                            ['icon' => 'fas fa-headset', 'color' => '#f59e0b', 'title' => '24/7 Support', 'desc' => 'Dedicated support team available round-the-clock to ensure your business never stops.'],
-                            ['icon' => 'fas fa-chart-line', 'color' => '#ef4444', 'title' => 'Proven ROI', 'desc' => 'Our clients see average 40% improvement in operational efficiency post-implementation.'],
+                            ['icon' => 'fas fa-shield-halved', 'color' => '#0284c7', 'title' => 'RERA & Legal Verification', 'desc' => 'All properties undergo rigorous title searches and statutory compliance checks before onboarding.'],
+                            ['icon' => 'fas fa-drafting-compass', 'color' => '#10b981', 'title' => 'Architectural & Engineering Rigor', 'desc' => 'In-house certified structural engineers and architects ensuring resilient, sustainable, and modern construction.'],
+                            ['icon' => 'fas fa-screwdriver-wrench', 'color' => '#f59e0b', 'title' => 'Complete Facility Maintenance', 'desc' => 'Dedicated on-ground maintenance squads providing round-the-clock property care and upkeep.'],
+                            ['icon' => 'fas fa-handshake', 'color' => '#ef4444', 'title' => 'End-to-End Client Support', 'desc' => 'From initial site tours and legal registration to interior fit-outs and post-possession care.'],
                         ];
                     }
                 @endphp
@@ -2469,22 +2469,22 @@
             <div class="fpc-header-center">
                 <div class="f-white-hud-badge">
                     <span class="f-white-radar-dot"></span>
-                    <span class="f-white-badge-subtitle">{{ setting('home_portfolio_badge', 'OUR PRODUCT ECOSYSTEM') }}</span>
+                    <span class="f-white-badge-subtitle">{{ setting('home_portfolio_badge', 'OUR DEVELOPMENTS') }}</span>
                     <span class="f-white-badge-divider"></span>
-                    <span class="f-white-badge-tag"><i class="fas fa-microchip"></i> LIVE DEPLOYMENTS</span>
+                    <span class="f-white-badge-tag"><i class="fas fa-building"></i> FEATURED DEVELOPMENTS</span>
                 </div>
                 <h2 class="fpc-center-title">
-                    {!! setting('home_portfolio_title', 'Featured <span class="f-white-gradient-text">Products</span> We\'re Proud Of') !!}
+                    {!! setting('home_portfolio_title', 'Featured <span class="f-white-gradient-text">Properties & Projects</span> We\'re Proud Of') !!}
                 </h2>
                 <p class="futuristic-hero-description fpc-center-desc">
-                    {{ setting('home_portfolio_subtitle', 'Browse our portfolio of high-impact products delivered for enterprise clients across industries worldwide.') }}
+                    {{ setting('home_portfolio_subtitle', 'Browse our portfolio of high-value residential complexes, commercial developments, and architectural landmarks.') }}
                 </p>
             </div>
 
             <!-- Right: View All Products Button -->
             <div class="fpc-header-right">
                 <a href="{{ setting('home_portfolio_button_url', route('portfolio')) }}" class="fpc-view-all-btn">
-                    <span>{{ setting('home_portfolio_button_text', 'View All Products') }}</span>
+                    <span>{{ setting('home_portfolio_button_text', 'View All Properties') }}</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -2520,7 +2520,7 @@
                             @endif
 
                             <div class="fpc-status-tag">
-                                <i class="fas fa-bolt"></i> Live
+                                <i class="fas fa-check-circle"></i> Verified
                             </div>
 
                             @if($project->featured_image)
@@ -2644,7 +2644,7 @@
                 <i class="fas fa-route"></i> {{ setting('home_process_badge', 'Our Process') }}
             </div>
             <h2 class="section-title" style="color:white">{!! setting('home_process_title', 'How We <span>Deliver Excellence</span>') !!}</h2>
-            <p class="section-subtitle" style="color:rgba(255,255,255,0.65)">{{ setting('home_process_subtitle', 'Our proven 6-step process ensures every project is delivered on time, within budget, and exceeds expectations.') }}</p>
+            <p class="section-subtitle" style="color:rgba(255,255,255,0.65)">{{ setting('home_process_subtitle', 'Our proven 6-step process ensures every real estate transaction and property project is delivered with precision, quality, and complete transparency.') }}</p>
         </div>
 
         <div class="process-grid">
@@ -2652,12 +2652,12 @@
                 $homeProcessSteps = json_decode(setting('home_process_steps', ''), true);
                 if (!is_array($homeProcessSteps) || empty($homeProcessSteps)) {
                     $homeProcessSteps = [
-                        ['number' => '1', 'icon' => 'fas fa-search', 'title' => 'Discovery', 'desc' => 'Understanding your goals, users, and technical requirements.'],
-                        ['number' => '2', 'icon' => 'fas fa-pencil-ruler', 'title' => 'Strategy', 'desc' => 'Crafting the perfect technology roadmap and architecture plan.'],
-                        ['number' => '3', 'icon' => 'fas fa-paint-brush', 'title' => 'Design', 'desc' => 'Beautiful, intuitive UI/UX designs approved by you.'],
-                        ['number' => '4', 'icon' => 'fas fa-code', 'title' => 'Develop', 'desc' => 'Agile development with weekly demos and transparent progress.'],
-                        ['number' => '5', 'icon' => 'fas fa-vial', 'title' => 'QA Testing', 'desc' => 'Comprehensive Quality Assurance testing for security & performance.'],
-                        ['number' => '6', 'icon' => 'fas fa-rocket', 'title' => 'Launch & Support', 'desc' => 'Smooth deployment with ongoing maintenance and growth support.'],
+                        ['number' => '1', 'icon' => 'fas fa-comments', 'title' => 'Consultation', 'desc' => 'Understanding your property goals, budget, spatial needs, and investment timeline.'],
+                        ['number' => '2', 'icon' => 'fas fa-map-marked-alt', 'title' => 'Feasibility & Valuation', 'desc' => 'Conducting thorough market analysis, legal verification, site surveys, and valuations.'],
+                        ['number' => '3', 'icon' => 'fas fa-drafting-compass', 'title' => 'Design & Planning', 'desc' => 'Developing tailored architectural layouts, structural blueprints, and regulatory approvals.'],
+                        ['number' => '4', 'icon' => 'fas fa-hard-hat', 'title' => 'Project Execution', 'desc' => 'Precision construction, interior fit-outs, and seamless transaction execution.'],
+                        ['number' => '5', 'icon' => 'fas fa-key', 'title' => 'Quality & Handover', 'desc' => 'Stringent quality audits, compliance sign-offs, and seamless on-time handover.'],
+                        ['number' => '6', 'icon' => 'fas fa-tools', 'title' => 'Maintenance & Care', 'desc' => 'Comprehensive building maintenance, asset management, and ongoing client support.'],
                     ];
                 }
             @endphp
@@ -3166,13 +3166,13 @@
                     <span class="f-white-radar-dot"></span>
                     <span class="f-white-badge-subtitle">{{ setting('home_blog_badge', 'LATEST INSIGHTS') }}</span>
                     <span class="f-white-badge-divider"></span>
-                    <span class="f-white-badge-tag"><i class="fas fa-bolt"></i> TECH & INNOVATION</span>
+                    <span class="f-white-badge-tag"><i class="fas fa-newspaper"></i> PROPERTY KNOWLEDGE</span>
                 </div>
                 <h2 class="f-blog-section-title">
-                    {!! setting('home_blog_title', 'Stay Ahead With Our <span class="f-white-gradient-text">Tech Insights</span>') !!}
+                    {!! setting('home_blog_title', 'Stay Ahead With Our <span class="f-white-gradient-text">Property & Market Insights</span>') !!}
                 </h2>
                 <p class="f-blog-section-desc">
-                    {{ setting('home_blog_subtitle', 'Explore expert perspectives, technical deep-dives, and digital transformation guides from our certified specialists.') }}
+                    {{ setting('home_blog_subtitle', 'Explore market trends, architectural ideas, investment strategies, and maintenance tips from our certified real estate experts.') }}
                 </p>
             </div>
 
@@ -3291,16 +3291,16 @@
     <div class="container" style="position:relative;z-index:1">
         <div data-aos="zoom-in">
             <div class="section-badge" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);margin-bottom:20px">
-                {{ setting('home_cta_badge', 'Start Your Project Today') }}
+                {{ setting('home_cta_badge', 'Start Your Property Journey Today') }}
             </div>
-            <h2>{!! setting('home_cta_title', 'Ready to Transform Your <br>Business with Technology?') !!}</h2>
-            <p>{{ setting('home_cta_body', 'Get a free consultation with our experts. No obligations, no commitments — just great advice tailored to your needs.') }}</p>
+            <h2>{!! setting('home_cta_title', 'Ready to Find Your Ideal Property or <br>Plan Your Next Project?') !!}</h2>
+            <p>{{ setting('home_cta_body', 'Get a free consultation with our real estate and architectural experts. No obligations, no commitments — just expert advice tailored to your needs.') }}</p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
                 <a href="{{ setting('home_cta_btn1_url', route('contact')) }}" class="btn" style="background:white;color:var(--primary);padding:16px 36px;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,0.2)">
-                    <i class="fas fa-comments"></i> {{ setting('home_cta_btn1_text', 'Demo') }}
+                    <i class="fas fa-calendar-check"></i> {{ setting('home_cta_btn1_text', 'Book Consultation') }}
                 </a>
                 <a href="{{ setting('home_cta_btn2_url', route('portfolio')) }}" class="btn btn-outline-white" style="padding:16px 36px;font-size:15px">
-                    <i class="fas fa-eye"></i> {{ setting('home_cta_btn2_text', 'View Our Work') }}
+                    <i class="fas fa-building"></i> {{ setting('home_cta_btn2_text', 'Explore Properties') }}
                 </a>
             </div>
             <p style="margin-top:20px;font-size:13px;color:rgba(255,255,255,0.6)">

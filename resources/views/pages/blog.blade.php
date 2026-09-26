@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Knowledge Hub & Tech Insights - Expert Articles | Rescom')
-@section('meta_description', 'Stay ahead with Rescom Knowledge Hub. Expert technical insights, architectural blueprints, cloud strategies, cybersecurity best practices, and enterprise engineering.')
+@section('title', setting('blog_meta_title', 'Real Estate & Architecture Insights - Expert Articles | Rescom'))
+@section('meta_description', setting('blog_meta_description', 'Stay ahead with Rescom Property Hub. Expert real estate market insights, architectural trends, property investment advice, and structural engineering updates.'))
 
 @section('content')
 <!-- =============== FUTURISTIC BLOG HERO (DARK CYBER THEME) =============== -->
@@ -972,35 +972,35 @@
         <!-- Live HUD Beacon -->
         <div class="f-hud-badge" data-aos="fade-down">
             <span class="f-radar-dot"></span>
-            <span class="f-badge-subtitle">KNOWLEDGE & ENGINEERING HUB</span>
+            <span class="f-badge-subtitle">PROPERTY & ARCHITECTURE HUB</span>
             <span class="f-badge-divider"></span>
-            <span class="f-badge-tag"><i class="fas fa-bolt"></i> 2026 TECH INSIGHTS</span>
+            <span class="f-badge-tag"><i class="fas fa-newspaper"></i> MARKET INSIGHTS</span>
         </div>
 
         <!-- Headline -->
         <h1 class="f-hero-title" data-aos="fade-up">
-            Tech Insights That <span class="f-gradient-text">Drive Innovation & Scale</span>
+            Insights That <span class="f-gradient-text">Shape Smart Property Decisions</span>
         </h1>
 
         <p class="f-hero-desc" data-aos="fade-up" data-aos-delay="100">
-            Expert technical analysis, architectural blueprints, cloud strategies, cybersecurity best practices, and enterprise engineering.
+            Expert real estate market analysis, architectural trends, property valuation guides, structural best practices, and industry news.
         </p>
 
         <!-- Catalog Telemetry Capsule -->
         <div class="f-catalog-stats" data-aos="fade-up" data-aos-delay="200">
             <div class="f-stat-item">
                 <span class="f-stat-val">{{ method_exists($posts, 'total') ? $posts->total() : $posts->count() }}</span>
-                <span>Published Insights</span>
+                <span>Published Articles</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
                 <span class="f-stat-val">{{ $categories->count() ?? '6+' }}</span>
-                <span>Subject Domains</span>
+                <span>Property Topics</span>
             </div>
             <div class="f-stat-sep"></div>
             <div class="f-stat-item">
                 <span class="f-stat-val">100%</span>
-                <span>Peer-Reviewed</span>
+                <span>Expert Verified</span>
             </div>
         </div>
     </div>
@@ -1268,9 +1268,9 @@
                             <div style="width:48px;height:48px;border-radius:14px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 12px auto">
                                 <i class="fas fa-paper-plane"></i>
                             </div>
-                            <h4 class="f-sidebar-cta-title">Weekly Engineering Digest</h4>
+                            <h4 class="f-sidebar-cta-title">Rescom Property Digest</h4>
                             <p class="f-sidebar-cta-desc">
-                                Join 5,000+ technology leaders receiving our weekly analysis on modern cloud, cybersecurity, and software architecture.
+                                Join thousands of property owners and investors receiving our weekly updates on real estate trends, architectural designs, and market opportunities.
                             </p>
                             <form action="{{ route('newsletter.subscribe') }}" method="POST">
                                 @csrf
@@ -1293,18 +1293,18 @@
 <section class="futuristic-cta-banner" data-aos="fade-up">
     <div class="container">
         <div class="f-cta-box">
-            <h2 class="f-cta-title">Need Custom Software or Cloud Architecture?</h2>
+            <h2 class="f-cta-title">Looking to Buy, Lease, or Build Your Next Property?</h2>
             <p class="f-cta-desc">
-                Partner with our multidisciplinary engineering squads to build and scale mission-critical digital systems with enterprise guarantees.
+                Connect with our real estate specialists, architects, and engineering consultants to guide your property journey.
             </p>
             <div class="f-cta-actions">
                 <a href="{{ route('contact') }}" class="f-btn-primary">
-                    <i class="fas fa-comments"></i>
-                    <span>Consult Our Architects</span>
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Book Consultation</span>
                 </a>
                 <a href="{{ route('portfolio') }}" class="f-btn-secondary">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Explore Products</span>
+                    <i class="fas fa-building"></i>
+                    <span>Explore Properties</span>
                 </a>
             </div>
         </div>

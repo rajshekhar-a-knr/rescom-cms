@@ -234,13 +234,6 @@ class SettingsController extends Controller
             }
         } elseif ($location === 'footer') {
             $defaultFooterItems = [
-                ['title' => 'Web Development', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 1, 'is_active' => 1],
-                ['title' => 'Mobile App Development', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 2, 'is_active' => 1],
-                ['title' => 'Cloud Solutions', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 3, 'is_active' => 1],
-                ['title' => 'Cybersecurity', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 4, 'is_active' => 1],
-                ['title' => 'AI & Machine Learning', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 5, 'is_active' => 1],
-                ['title' => 'Digital Transformation', 'url' => '/services', 'item_type' => 'link', 'section' => 'services', 'sort_order' => 6, 'is_active' => 1],
-
                 ['title' => 'Corporate Presentation', 'url' => '/presentations/rescom-presentation', 'item_type' => 'presentation', 'section' => 'company', 'target' => '_blank', 'badge_text' => 'Live', 'sort_order' => 1, 'is_active' => 1],
                 ['title' => 'About Us', 'url' => '/about', 'item_type' => 'link', 'section' => 'company', 'sort_order' => 2, 'is_active' => 1],
                 ['title' => 'Our Products', 'url' => '/portfolio', 'item_type' => 'link', 'section' => 'company', 'sort_order' => 3, 'is_active' => 1],

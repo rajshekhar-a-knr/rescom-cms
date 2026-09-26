@@ -136,7 +136,7 @@
             <div class="form-group">
                 <label class="form-label">Process Steps (JSON)</label>
                 <textarea name="home_process_steps" class="form-control" rows="4">{{ $get('home_process_steps') }}</textarea>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Format: [{"number":"1","icon":"fas fa-search","title":"Discovery","desc":"..."}]</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Format: [{"number":"1","icon":"fas fa-comments","title":"Consultation","desc":"..."}]</div>
             </div>
 
             <div class="form-row">
